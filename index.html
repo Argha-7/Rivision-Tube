@@ -349,6 +349,29 @@
               rows="3" 
               placeholder="Revision notes... Or click '✨ AI Master Notes' for transcript & formula breakdown, or '🎨 AI Visual' for 3D diagram!"
             ></textarea>
+            
+            <!-- ChatGPT-Style Rich Multimedia AI Flashcard Live Preview -->
+            <div id="richAiFlashcardBox" class="chatgpt-flashcard-box" style="display: none;">
+              <div class="chatgpt-flashcard-header">
+                <span class="chatgpt-badge">🤖 AI MASTER FLASHCARD</span>
+                <button type="button" id="removeRichFlashcardBtn" class="chatgpt-close-btn" title="Close Flashcard Preview">✕</button>
+              </div>
+              
+              <div class="chatgpt-card-banner" id="chatgptCardBanner" style="display: none;">
+                <img id="chatgptCardImg" src="" alt="Concept Diagram" class="chatgpt-card-img" />
+                <div class="chatgpt-img-overlay">
+                  <span id="chatgptImgTag">🎨 3D Concept Diagram</span>
+                </div>
+              </div>
+              
+              <div class="chatgpt-card-content" id="chatgptCardContent"></div>
+              
+              <div class="chatgpt-card-actions">
+                <button type="button" id="chatgptTtsBtn" class="chatgpt-action-btn">🔊 Read Notes</button>
+                <button type="button" id="chatgptRedrawBtn" class="chatgpt-action-btn" style="color: #c084fc;">🎨 Redraw 3D Art</button>
+              </div>
+            </div>
+
             <div id="aiVisualPreviewContainer" style="display: none; margin-top: 8px; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); position: relative;">
               <img id="aiVisualPreviewImg" src="" alt="AI Visual Diagram" style="width: 100%; max-height: 220px; object-fit: cover; display: block;" />
               <button type="button" id="removeAiVisualBtn" style="position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.7); color: #fff; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer;">✕</button>

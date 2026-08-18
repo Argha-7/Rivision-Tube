@@ -883,6 +883,14 @@ function getTagClass(tag) {
   }
 }
 
+function renderClipNoteHtml(noteText) {
+  if (!noteText) return '';
+  if (noteText.includes('MASTER TEACHER') || noteText.includes('Spoken Transcript') || noteText.includes('TOPPER') || noteText.includes('FORMULA')) {
+    return `<div class="yt-clip-rich-notes">${formatAiNotesToChatGPTCards(noteText, '')}</div>`;
+  }
+  return `<div class="yt-clip-note">💡 ${escapeHtml(noteText)}</div>`;
+}
+
 function createClipCardElement(clip) {
   const card = document.createElement('div');
   const tagClass = getTagClass(clip.tag);
@@ -913,8 +921,9 @@ function createClipCardElement(clip) {
           <span>${clip.subject || 'General'}</span> • <span>${clip.chapter || 'Topic'}</span>
           <span class="${srBadgeClass}">${levelStr}</span>
         </div>
-        ${clip.note ? `<div class="yt-clip-note">💡 ${escapeHtml(clip.note)}</div><button type="button" class="yt-btn-read-note" data-action="read-note">🔊 Read Notes</button>` : ''}
         ${clip.aiVisualUrl ? `<div class="yt-clip-visual"><img src="${clip.aiVisualUrl}" alt="${escapeHtml(clip.title)}" class="yt-clip-visual-img" loading="lazy" /></div>` : ''}
+        ${clip.note ? renderClipNoteHtml(clip.note) : ''}
+        ${clip.note ? `<button type="button" class="yt-btn-read-note" data-action="read-note">🔊 Read Notes</button>` : ''}
         ${clip.voiceNoteBase64 ? `<button type="button" class="yt-btn-play-voice" data-action="play-voice">🎙️ Listen Memo</button>` : ''}
       </div>
 
@@ -1643,7 +1652,30 @@ function setupEventListeners() {
 
   const genVisualCardBtn = document.getElementById('genVisualCardBtn');
   if (genVisualCardBtn) {
-    genVisualCardBtn.addEventListener('click', handleGenerateVisualCard);
+    genVisualCardBtn.addEventListener('click', () => handleGenerateVisualCard());
+  }
+
+  const removeRichFlashcardBtn = document.getElementById('removeRichFlashcardBtn');
+  if (removeRichFlashcardBtn) {
+    removeRichFlashcardBtn.addEventListener('click', () => {
+      const box = document.getElementById('richAiFlashcardBox');
+      const input = document.getElementById('aiVisualUrlInput');
+      if (box) box.style.display = 'none';
+      if (input) input.value = '';
+    });
+  }
+
+  const chatgptTtsBtn = document.getElementById('chatgptTtsBtn');
+  if (chatgptTtsBtn) {
+    chatgptTtsBtn.addEventListener('click', () => {
+      const note = document.getElementById('clipNoteInput').value;
+      if (note) readOutNoteWithTTS(note);
+    });
+  }
+
+  const chatgptRedrawBtn = document.getElementById('chatgptRedrawBtn');
+  if (chatgptRedrawBtn) {
+    chatgptRedrawBtn.addEventListener('click', () => handleGenerateVisualCard());
   }
 
   const removeAiVisualBtn = document.getElementById('removeAiVisualBtn');
@@ -2351,10 +2383,19 @@ CRITICAL INSTRUCTIONS:
       noteTextarea.focus();
     }
 
+    // Render ChatGPT-Style Rich Multimedia AI Flashcard
+    const richBox = document.getElementById('richAiFlashcardBox');
+    const richContent = document.getElementById('chatgptCardContent');
+    if (richBox && richContent) {
+      richContent.innerHTML = formatAiNotesToChatGPTCards(aiNotes, verbatimTranscript);
+      richBox.style.display = 'block';
+    }
+
     // Auto-generate 3D Visual Diagram for a complete Visual Flashcard
     const visualInput = document.getElementById('aiVisualUrlInput');
     if (!visualInput || !visualInput.value) {
-      handleGenerateVisualCard();
+      const topicContext = `${topicTitle || ''} ${verbatimTranscript.substring(0, 120)}`.trim();
+      handleGenerateVisualCard(topicContext);
     }
 
     if (fetchedFromTranscriptAPI) {
@@ -2368,6 +2409,97 @@ CRITICAL INSTRUCTIONS:
 
   if (btn) btn.classList.remove('loading');
   if (btnText) btnText.textContent = '✨ AI Master Notes';
+}
+
+function formatAiNotesToChatGPTCards(rawText, transcriptText) {
+  let html = '';
+
+  // 1. Spoken Transcript Quote
+  if (transcriptText && transcriptText.trim()) {
+    html += `
+      <div class="cg-transcript-block">
+        <div class="cg-transcript-title">📝 Spoken Verbatim Transcript:</div>
+        <div class="cg-transcript-text">"${escapeHtml(transcriptText.trim())}"</div>
+      </div>
+    `;
+  }
+
+  if (!rawText) return html;
+
+  // Process sections
+  const lines = rawText.split('\n');
+  let currentBlock = null;
+  let blockContent = [];
+
+  function flushBlock() {
+    const text = blockContent.join('\n').trim();
+    if (!text) return;
+
+    if (currentBlock === 'teacher') {
+      html += `
+        <div class="cg-teacher-block">
+          <div class="cg-teacher-title">🎓 Master Teacher Conceptual Breakdown</div>
+          <div class="cg-bullet-list">${escapeHtml(text)}</div>
+        </div>
+      `;
+    } else if (currentBlock === 'trick') {
+      html += `
+        <div class="cg-trick-block">
+          <div class="cg-trick-title">⚡ Topper's Secret Shortcut & Trick</div>
+          <div class="cg-bullet-list" style="color: #fef08a;">${escapeHtml(text)}</div>
+        </div>
+      `;
+    } else if (currentBlock === 'trap') {
+      html += `
+        <div class="cg-trap-block">
+          <div class="cg-trap-title">⚠️ Common Exam Trap Alert</div>
+          <div class="cg-bullet-list" style="color: #fca5a5;">${escapeHtml(text)}</div>
+        </div>
+      `;
+    } else if (currentBlock === 'formula') {
+      html += `
+        <div class="cg-formula-block">
+          <div class="cg-formula-title">📐 Must-Remember Formulas & Core Laws</div>
+          <div class="cg-bullet-list" style="color: #e9d5ff; font-weight: 600;">${escapeHtml(text)}</div>
+        </div>
+      `;
+    }
+  }
+
+  lines.forEach(line => {
+    const trimmed = line.trim();
+    if (trimmed.includes('MASTER TEACHER') || trimmed.startsWith('1.')) {
+      flushBlock();
+      currentBlock = 'teacher';
+      blockContent = [];
+    } else if (trimmed.includes('TOPPER') || trimmed.includes('SHORTCUT') || trimmed.startsWith('2.')) {
+      flushBlock();
+      currentBlock = 'trick';
+      blockContent = [];
+    } else if (trimmed.includes('EXAM TRAP') || trimmed.startsWith('3.')) {
+      flushBlock();
+      currentBlock = 'trap';
+      blockContent = [];
+    } else if (trimmed.includes('FORMULA') || trimmed.includes('MUST-REMEMBER') || trimmed.startsWith('4.')) {
+      flushBlock();
+      currentBlock = 'formula';
+      blockContent = [];
+    } else if (trimmed) {
+      blockContent.push(trimmed);
+    }
+  });
+  flushBlock();
+
+  if (!html) {
+    html += `
+      <div class="cg-teacher-block">
+        <div class="cg-teacher-title">🎓 Master Revision Breakdown</div>
+        <div class="cg-bullet-list">${escapeHtml(rawText)}</div>
+      </div>
+    `;
+  }
+
+  return html;
 }
 
 async function transcribeAudioBlobWithGroq(audioBlob) {
@@ -2421,50 +2553,51 @@ async function transcribeAudioBlobWithGroq(audioBlob) {
   }
 }
 
-async function handleGenerateVisualCard() {
-  const title = document.getElementById('clipTitleInput').value.trim() || appState.currentVideoTitle || 'Science Educational Concept';
+async function handleGenerateVisualCard(customTopic) {
+  const title = customTopic || document.getElementById('clipTitleInput').value.trim() || appState.currentVideoTitle || 'Science Educational Concept';
   const subject = document.getElementById('subjectSelect').value || 'Physics';
   const btn = document.getElementById('genVisualCardBtn');
-  const container = document.getElementById('aiVisualPreviewContainer');
-  const img = document.getElementById('aiVisualPreviewImg');
+  const box = document.getElementById('richAiFlashcardBox');
+  const banner = document.getElementById('chatgptCardBanner');
+  const img = document.getElementById('chatgptCardImg');
   const input = document.getElementById('aiVisualUrlInput');
 
-  if (btn) btn.innerHTML = '<span>🎨 Generating...</span>';
-  showToast('Generating HD Concept Visual with AI... 🎨✨', 'info');
+  if (btn) btn.innerHTML = '<span>🎨 Drawing 3D Art...</span>';
+  showToast('Generating 3D Concept Diagram for Flashcard... 🎨✨', 'info');
 
   try {
-    const cleanPrompt = encodeURIComponent(`high quality educational 3D concept illustration of ${title}, subject: ${subject}, science diagram, vivid colors, crisp textbook art`);
-    const imageUrl = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=800&height=480&nologo=true&seed=${Date.now()}`;
+    const cleanTopic = title.replace(/[^\w\s]/gi, ' ').substring(0, 80).trim();
+    const cleanPrompt = encodeURIComponent(`accurate 3D educational concept illustration diagram of ${cleanTopic}, subject: ${subject}, science textbook ray diagram, clear lighting, crisp details, 8k render`);
+    const imageUrl = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=800&height=460&nologo=true&seed=${Date.now()}`;
 
-    // Preload image so it never shows a broken icon
+    // Preload image
     const tempImg = new Image();
     tempImg.onload = () => {
-      if (img && container && input) {
+      if (img && banner && input) {
         img.src = tempImg.src;
         input.value = tempImg.src;
-        container.style.display = 'block';
+        banner.style.display = 'block';
+        if (box) box.style.display = 'block';
       }
       if (btn) btn.innerHTML = '<span>🎨 AI Visual</span>';
-      showToast('🎨 HD Visual Diagram Ready! ✨', 'success');
+      showToast('🎨 3D Concept Visual Ready! ✨', 'success');
     };
 
     tempImg.onerror = () => {
-      // High quality educational fallback
       const fallbackUrl = `https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=800&q=80`;
-      if (img && container && input) {
+      if (img && banner && input) {
         img.src = fallbackUrl;
         input.value = fallbackUrl;
-        container.style.display = 'block';
+        banner.style.display = 'block';
+        if (box) box.style.display = 'block';
       }
       if (btn) btn.innerHTML = '<span>🎨 AI Visual</span>';
-      showToast('🎨 Concept Visual Loaded! ✨', 'success');
     };
 
     tempImg.src = imageUrl;
 
   } catch (err) {
     if (btn) btn.innerHTML = '<span>🎨 AI Visual</span>';
-    showToast('Could not generate visual image.', 'error');
   }
 }
 

@@ -2723,25 +2723,30 @@ body.yt-dark-theme {
   .mob-nav-label {
     font-size: 0.65rem;
     font-weight: 600;
+    letter-spacing: 0.1px;
   }
 
   .mob-nav-bookmark-btn {
     position: relative;
   }
 
-  .mob-bookmark-circle {
-    width: 36px;
-    height: 36px;
+  .mob-nav-bookmark-btn .mob-bookmark-circle {
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #10b981, #059669);
+    background: #3ea6ff;
+    color: #000;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #fff;
-    font-size: 1.15rem;
-    box-shadow: 0 3px 12px rgba(16, 185, 129, 0.4);
-    margin-top: -12px;
-    border: 2px solid #0f0f0f;
+    font-size: 1.25rem;
+    font-weight: 900;
+    box-shadow: 0 4px 12px rgba(62, 166, 255, 0.4);
+    margin-top: -8px;
+    transition: transform 0.15s ease;
+  }
+  .mob-nav-bookmark-btn:active .mob-bookmark-circle {
+    transform: scale(0.92);
   }
 
   .mob-nav-badge {
