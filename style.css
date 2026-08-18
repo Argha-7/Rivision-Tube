@@ -593,12 +593,56 @@ body.yt-dark-theme {
   gap: 5px;
 }
 
-.fs-live-time {
-  font-family: var(--font-mono);
-  font-size: 0.82rem;
+.fs-btn-snap {
+  background: rgba(16, 185, 129, 0.25);
+  border: 1px solid rgba(16, 185, 129, 0.5);
+  color: #34d399;
+  font-family: var(--font-sans);
+  font-size: 0.76rem;
   font-weight: 700;
-  color: var(--yt-blue);
-  letter-spacing: 0.3px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all var(--transition-fast);
+}
+.fs-btn-snap:hover {
+  background: #10b981;
+  color: #fff;
+  transform: scale(1.04);
+}
+
+.yt-btn-gallery-tag {
+  background: rgba(14, 165, 233, 0.15);
+  border: 1px solid rgba(14, 165, 233, 0.4);
+  color: #38bdf8;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  margin-right: 6px;
+  transition: var(--transition-fast);
+}
+.yt-btn-gallery-tag:hover {
+  background: rgba(14, 165, 233, 0.3);
+  color: #fff;
+}
+
+.copy-prompt-btn:hover {
+  filter: brightness(1.2);
+}
+
+.gallery-modal-box {
+  background: #121212 !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.95), 0 0 30px rgba(56, 189, 248, 0.25) !important;
 }
 
 .fs-dock-actions {
@@ -2723,30 +2767,25 @@ body.yt-dark-theme {
   .mob-nav-label {
     font-size: 0.65rem;
     font-weight: 600;
-    letter-spacing: 0.1px;
   }
 
   .mob-nav-bookmark-btn {
     position: relative;
   }
 
-  .mob-nav-bookmark-btn .mob-bookmark-circle {
-    width: 38px;
-    height: 38px;
+  .mob-bookmark-circle {
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
-    background: #3ea6ff;
-    color: #000;
+    background: linear-gradient(135deg, #10b981, #059669);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.25rem;
-    font-weight: 900;
-    box-shadow: 0 4px 12px rgba(62, 166, 255, 0.4);
-    margin-top: -8px;
-    transition: transform 0.15s ease;
-  }
-  .mob-nav-bookmark-btn:active .mob-bookmark-circle {
-    transform: scale(0.92);
+    color: #fff;
+    font-size: 1.15rem;
+    box-shadow: 0 3px 12px rgba(16, 185, 129, 0.4);
+    margin-top: -12px;
+    border: 2px solid #0f0f0f;
   }
 
   .mob-nav-badge {

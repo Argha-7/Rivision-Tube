@@ -159,6 +159,9 @@
                 <button type="button" class="fs-btn fs-btn-end" id="fsCaptureEndBtn" title="Set Auto-Stop End Timestamp">
                   ⏹ End: <span id="fsEndPreview">--:--</span>
                 </button>
+                <button type="button" class="fs-btn fs-btn-snap" id="fsCaptureSnapshotBtn" title="Capture exact video player slide snapshot" style="background: rgba(16, 185, 129, 0.25); color: #34d399; border-color: rgba(16, 185, 129, 0.5);">
+                  📸 Snapshot
+                </button>
                 <button type="button" class="fs-btn fs-btn-save" id="fsQuickSaveBtn" title="Save this clip to library">
                   💾 Save
                 </button>
@@ -334,47 +337,57 @@
           <div class="yt-form-group">
             <div class="label-with-action">
               <label for="clipNoteInput">Recall Note / Teacher's Mentor Notes <span class="opt">Optional</span></label>
-              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <div style="display: flex; gap: 6px; flex-wrap: wrap;">
                 <button type="button" class="yt-link-action yt-fetch-transcript-btn" id="fetchTranscriptBtn" title="Groq + TranscriptAPI + Gemini Master Teacher Notes">
                   <span id="fetchTranscriptBtnText">✨ AI Master Notes</span>
                 </button>
-                <button type="button" class="yt-link-action" id="genVisualCardBtn" title="Pollinations FLUX.1: Generate 1024p HD Visual Concept Diagram / Artwork" style="background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3);">
-                  <span>🎨 AI Visual</span>
+                <button type="button" class="yt-link-action" id="genPromptsBtn" title="Generate Midjourney / ChatGPT Prompts" style="background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3);">
+                  <span>🎯 AI Prompts</span>
                 </button>
+                <button type="button" class="yt-link-action" id="captureFormSnapshotBtn" title="Capture exact video player slide snapshot" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3);">
+                  <span>📸 Snapshot</span>
+                </button>
+                <label class="yt-link-action" style="cursor: pointer; background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: var(--radius-xs);" title="Upload photo or screenshot from computer">
+                  <span>📁 Upload</span>
+                  <input type="file" id="clipImageFileInput" accept="image/*" style="display: none;" />
+                </label>
               </div>
             </div>
             <textarea 
               id="clipNoteInput" 
               class="yt-form-textarea" 
               rows="3" 
-              placeholder="Revision notes... Or click '✨ AI Master Notes' for transcript & formula breakdown, or '🎨 AI Visual' for 3D diagram!"
+              placeholder="Revision notes... Or click '✨ AI Master Notes' for transcript & formula breakdown, '🎯 AI Prompts' for custom prompts, or '📸 Snapshot' for board capture!"
             ></textarea>
-            
-            <!-- ChatGPT-Style Rich Multimedia AI Flashcard Live Preview -->
-            <div id="richAiFlashcardBox" class="chatgpt-flashcard-box" style="display: none;">
-              <div class="chatgpt-flashcard-header">
-                <span class="chatgpt-badge">🤖 AI MASTER FLASHCARD</span>
-                <button type="button" id="removeRichFlashcardBtn" class="chatgpt-close-btn" title="Close Flashcard Preview">✕</button>
+
+            <!-- 🎯 Generated Master AI Prompts Deck (Collapsible) -->
+            <div id="aiPromptsDeck" class="ai-prompts-deck" style="display: none; margin-top: 8px; background: rgba(15, 15, 15, 0.95); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: var(--radius-sm); padding: 10px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-size: 0.78rem; font-weight: 700; color: #c084fc;">🎯 Generated Master AI Prompts (Copy & Use):</span>
+                <button type="button" id="closePromptsDeckBtn" style="background: none; border: none; color: #aaa; cursor: pointer; font-size: 0.8rem;">✕</button>
               </div>
-              
-              <div class="chatgpt-card-banner" id="chatgptCardBanner" style="display: none;">
-                <img id="chatgptCardImg" src="" alt="Concept Diagram" class="chatgpt-card-img" />
-                <div class="chatgpt-img-overlay">
-                  <span id="chatgptImgTag">🎨 3D Concept Diagram</span>
+
+              <div class="prompt-card" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-xs); padding: 8px; margin-bottom: 8px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                  <span style="font-size: 0.72rem; font-weight: 700; color: #38bdf8;">🎨 Image Prompt (Midjourney / DALL-E / Flux / Bing):</span>
+                  <button type="button" class="copy-prompt-btn" id="copyImagePromptBtn" style="background: rgba(56, 189, 248, 0.2); border: 1px solid rgba(56, 189, 248, 0.4); color: #38bdf8; font-size: 0.68rem; padding: 2px 7px; border-radius: var(--radius-xs); cursor: pointer;">📋 Copy</button>
                 </div>
+                <div id="imagePromptText" style="font-size: 0.73rem; color: #e2e8f0; line-height: 1.4; font-family: var(--font-mono); max-height: 80px; overflow-y: auto;">Prompt will appear here...</div>
               </div>
-              
-              <div class="chatgpt-card-content" id="chatgptCardContent"></div>
-              
-              <div class="chatgpt-card-actions">
-                <button type="button" id="chatgptTtsBtn" class="chatgpt-action-btn">🔊 Read Notes</button>
-                <button type="button" id="chatgptRedrawBtn" class="chatgpt-action-btn" style="color: #c084fc;">🎨 Redraw 3D Art</button>
+
+              <div class="prompt-card" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-xs); padding: 8px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                  <span style="font-size: 0.72rem; font-weight: 700; color: #34d399;">🧠 Deep Study Prompt (ChatGPT / Claude / Gemini):</span>
+                  <button type="button" class="copy-prompt-btn" id="copyStudyPromptBtn" style="background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399; font-size: 0.68rem; padding: 2px 7px; border-radius: var(--radius-xs); cursor: pointer;">📋 Copy</button>
+                </div>
+                <div id="studyPromptText" style="font-size: 0.73rem; color: #e2e8f0; line-height: 1.4; font-family: var(--font-mono); max-height: 80px; overflow-y: auto;">Prompt will appear here...</div>
               </div>
             </div>
 
-            <div id="aiVisualPreviewContainer" style="display: none; margin-top: 8px; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); position: relative;">
-              <img id="aiVisualPreviewImg" src="" alt="AI Visual Diagram" style="width: 100%; max-height: 220px; object-fit: cover; display: block;" />
-              <button type="button" id="removeAiVisualBtn" style="position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.7); color: #fff; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer;">✕</button>
+            <!-- Image Snapshot / Attached Preview -->
+            <div id="aiVisualPreviewContainer" style="display: none; margin-top: 8px; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); position: relative; background: #000;">
+              <img id="aiVisualPreviewImg" src="" alt="Lecture Slide Snapshot" style="width: 100%; max-height: 220px; object-fit: cover; display: block;" />
+              <button type="button" id="removeAiVisualBtn" style="position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.75); color: #fff; border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; width: 26px; height: 26px; cursor: pointer; display: flex; align-items: center; justify-content: center;" title="Remove Photo">✕</button>
             </div>
             <input type="hidden" id="aiVisualUrlInput" />
           </div>
@@ -573,6 +586,44 @@
           <button type="submit" class="yt-btn yt-btn-primary">Save Changes</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- 🖼️ Clip Visual Gallery & Formula Breakdown Modal -->
+  <div class="modal-backdrop" id="clipVisualGalleryModal" style="display:none;">
+    <div class="modal-box gallery-modal-box" style="max-width: 720px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden;">
+      <div class="modal-header">
+        <div class="header-title" style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 1.3rem;">🖼️</span>
+          <h3 id="galleryModalTitle">Lecture Visual Slide & Formulas</h3>
+        </div>
+        <button class="modal-close-btn" id="closeVisualGalleryBtn" title="Close Gallery (Esc)">✕</button>
+      </div>
+      <div class="modal-body gallery-modal-body" style="padding: 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px;">
+        <div class="gallery-image-wrapper" style="width: 100%; border-radius: var(--radius-sm); overflow: hidden; background: #000; border: 1px solid rgba(255,255,255,0.1); max-height: 380px; display: flex; align-items: center; justify-content: center;">
+          <img id="galleryModalImg" src="" alt="Lecture Slide Snapshot" style="max-width: 100%; max-height: 380px; object-fit: contain; display: block;" />
+        </div>
+        
+        <div class="gallery-details-wrapper" style="display: flex; flex-direction: column; gap: 8px;">
+          <div class="gallery-meta-row" id="galleryModalMeta" style="font-size: 0.75rem; color: var(--yt-blue); font-weight: 700; text-transform: uppercase;">
+            Physics • Gauss Law • 02:15 - 04:00
+          </div>
+          <h4 id="galleryModalHeading" style="font-size: 1.05rem; font-weight: 700; color: #fff; margin: 0;">Topic Title</h4>
+          
+          <div class="gallery-notes-box" id="galleryModalNotes" style="font-size: 0.82rem; color: var(--yt-text-primary); line-height: 1.5; background: rgba(0,0,0,0.5); padding: 10px 12px; border-radius: var(--radius-xs); border-left: 3px solid var(--yt-blue); white-space: pre-wrap;">
+            Formulas and notes will appear here...
+          </div>
+          
+          <div class="gallery-actions-row" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px;">
+            <button type="button" class="yt-btn yt-btn-primary yt-btn-sm" id="galleryListenBtn" style="background: linear-gradient(135deg, #9333ea, #7e22ce);">
+              🔊 Listen Notes (Hindi)
+            </button>
+            <button type="button" class="yt-btn yt-btn-secondary yt-btn-sm" id="galleryPlayVideoBtn">
+              ▶ Play Timestamp
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 

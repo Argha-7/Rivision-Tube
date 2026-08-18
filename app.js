@@ -541,16 +541,17 @@ function triggerClipCompletion() {
       if (titleElem) titleElem.textContent = clip.title || 'Concept Finished';
       if (metaElem) metaElem.textContent = `${clip.subject || 'General'} • ${clip.chapter || 'Topic'} (${clip.tag || 'Concept'})`;
 
-      // Show AI Visual Concept Art on Flashcard (Always show topic-relevant 3D illustration)
-      if (visualImg && imgContainer) {
-        const topicImageUrl = clip.aiVisualUrl || `https://image.pollinations.ai/prompt/${encodeURIComponent('accurate 3D educational concept illustration of ' + (clip.title || 'Science') + ', ' + (clip.subject || 'Physics') + ', textbook diagram')}?width=800&height=440&nologo=true`;
-        visualImg.src = topicImageUrl;
+      // Show AI Visual Concept Art on Flashcard
+      if (clip.aiVisualUrl && visualImg && imgContainer) {
+        visualImg.src = clip.aiVisualUrl;
         imgContainer.style.display = 'block';
+      } else if (imgContainer) {
+        imgContainer.style.display = 'none';
       }
 
-      // Prepare Secret Formulas & Notes with ChatGPT-style rich boxes
+      // Prepare Secret Formulas & Notes
       if (noteContent && notesBox) {
-        noteContent.innerHTML = formatAiNotesToChatGPTCards(clip.note || 'Mastered concept! No extra formulas attached.', '');
+        noteContent.textContent = clip.note || 'No additional formulas attached. Mastered concept!';
         notesBox.style.display = 'none'; // Initially hidden for active recall
       }
 
@@ -882,14 +883,6 @@ function getTagClass(tag) {
   }
 }
 
-function renderClipNoteHtml(noteText) {
-  if (!noteText) return '';
-  if (noteText.includes('MASTER TEACHER') || noteText.includes('Spoken Transcript') || noteText.includes('TOPPER') || noteText.includes('FORMULA')) {
-    return `<div class="yt-clip-rich-notes">${formatAiNotesToChatGPTCards(noteText, '')}</div>`;
-  }
-  return `<div class="yt-clip-note">💡 ${escapeHtml(noteText)}</div>`;
-}
-
 function createClipCardElement(clip) {
   const card = document.createElement('div');
   const tagClass = getTagClass(clip.tag);
@@ -920,10 +913,12 @@ function createClipCardElement(clip) {
           <span>${clip.subject || 'General'}</span> • <span>${clip.chapter || 'Topic'}</span>
           <span class="${srBadgeClass}">${levelStr}</span>
         </div>
-        ${clip.aiVisualUrl ? `<div class="yt-clip-visual"><img src="${clip.aiVisualUrl}" alt="${escapeHtml(clip.title)}" class="yt-clip-visual-img" loading="lazy" /></div>` : ''}
-        ${clip.note ? renderClipNoteHtml(clip.note) : ''}
-        ${clip.note ? `<button type="button" class="yt-btn-read-note" data-action="read-note">🔊 Read Notes</button>` : ''}
-        ${clip.voiceNoteBase64 ? `<button type="button" class="yt-btn-play-voice" data-action="play-voice">🎙️ Listen Memo</button>` : ''}
+        <div class="yt-clip-badges-row" style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;">
+          ${clip.note ? `<button type="button" class="yt-btn-read-note" data-action="read-note">🔊 Hindi Voice</button>` : ''}
+          ${clip.aiVisualUrl ? `<button type="button" class="yt-btn-gallery-tag" data-action="open-gallery">🖼️ Visual Slide</button>` : ''}
+          ${clip.voiceNoteBase64 ? `<button type="button" class="yt-btn-play-voice" data-action="play-voice">🎙️ Listen Memo</button>` : ''}
+        </div>
+        ${clip.aiVisualUrl ? `<div class="yt-clip-visual" style="cursor: pointer;" data-action="open-gallery" title="Click to open Full HD Visual Gallery"><img src="${clip.aiVisualUrl}" alt="${escapeHtml(clip.title)}" class="yt-clip-visual-img" loading="lazy" /></div>` : ''}
       </div>
 
       <div class="yt-clip-actions">
@@ -945,7 +940,7 @@ function createClipCardElement(clip) {
 
   card.addEventListener('click', (e) => {
     // If clicking card outside buttons, play
-    if (!e.target.closest('button') && !e.target.closest('a')) {
+    if (!e.target.closest('button') && !e.target.closest('a') && !e.target.closest('.yt-clip-visual')) {
       playSpecificClip(clip);
     }
   });
@@ -953,6 +948,14 @@ function createClipCardElement(clip) {
   card.querySelector('[data-action="play"]').addEventListener('click', (e) => {
     e.stopPropagation();
     playSpecificClip(clip);
+  });
+
+  const galleryBtns = card.querySelectorAll('[data-action="open-gallery"]');
+  galleryBtns.forEach(gBtn => {
+    gBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openVisualGalleryModal(clip);
+    });
   });
 
   const readNoteBtn = card.querySelector('[data-action="read-note"]');
@@ -1638,7 +1641,7 @@ function setupEventListeners() {
     });
   }
 
-  // 1.35 Auto-Fetch YouTube Transcript for Timeframe & AI Visuals
+  // 1.35 Auto-Fetch YouTube Transcript for Timeframe
   const fetchTranscriptBtn = document.getElementById('fetchTranscriptBtn');
   if (fetchTranscriptBtn) {
     fetchTranscriptBtn.addEventListener('click', () => handleFetchTranscriptForTimeframe(false));
@@ -1649,33 +1652,107 @@ function setupEventListeners() {
     editFetchTranscriptBtn.addEventListener('click', () => handleFetchTranscriptForTimeframe(true));
   }
 
-  const genVisualCardBtn = document.getElementById('genVisualCardBtn');
-  if (genVisualCardBtn) {
-    genVisualCardBtn.addEventListener('click', () => handleGenerateVisualCard());
+  // 1.36 Master AI Prompts Generator & Copy Handlers
+  const genPromptsBtn = document.getElementById('genPromptsBtn');
+  if (genPromptsBtn) {
+    genPromptsBtn.addEventListener('click', generateMasterAIPrompts);
   }
 
-  const removeRichFlashcardBtn = document.getElementById('removeRichFlashcardBtn');
-  if (removeRichFlashcardBtn) {
-    removeRichFlashcardBtn.addEventListener('click', () => {
-      const box = document.getElementById('richAiFlashcardBox');
-      const input = document.getElementById('aiVisualUrlInput');
-      if (box) box.style.display = 'none';
-      if (input) input.value = '';
+  const closePromptsDeckBtn = document.getElementById('closePromptsDeckBtn');
+  if (closePromptsDeckBtn) {
+    closePromptsDeckBtn.addEventListener('click', () => {
+      const deck = document.getElementById('aiPromptsDeck');
+      if (deck) deck.style.display = 'none';
     });
   }
 
-  const chatgptTtsBtn = document.getElementById('chatgptTtsBtn');
-  if (chatgptTtsBtn) {
-    chatgptTtsBtn.addEventListener('click', () => {
-      const note = document.getElementById('clipNoteInput').value;
-      if (note) readOutNoteWithTTS(note);
+  const copyImagePromptBtn = document.getElementById('copyImagePromptBtn');
+  if (copyImagePromptBtn) {
+    copyImagePromptBtn.addEventListener('click', () => {
+      const text = document.getElementById('imagePromptText').textContent;
+      if (text) {
+        navigator.clipboard.writeText(text);
+        copyImagePromptBtn.textContent = '✅ Copied!';
+        setTimeout(() => copyImagePromptBtn.textContent = '📋 Copy', 1500);
+        showToast('🎨 Image AI Prompt Copied to Clipboard!', 'success');
+      }
     });
   }
 
-  const chatgptRedrawBtn = document.getElementById('chatgptRedrawBtn');
-  if (chatgptRedrawBtn) {
-    chatgptRedrawBtn.addEventListener('click', () => handleGenerateVisualCard());
+  const copyStudyPromptBtn = document.getElementById('copyStudyPromptBtn');
+  if (copyStudyPromptBtn) {
+    copyStudyPromptBtn.addEventListener('click', () => {
+      const text = document.getElementById('studyPromptText').textContent;
+      if (text) {
+        navigator.clipboard.writeText(text);
+        copyStudyPromptBtn.textContent = '✅ Copied!';
+        setTimeout(() => copyStudyPromptBtn.textContent = '📋 Copy', 1500);
+        showToast('🧠 Deep Study AI Prompt Copied to Clipboard!', 'success');
+      }
+    });
   }
+
+  // 1.37 Video Player Screen Snapshot Handlers
+  const captureFormSnapshotBtn = document.getElementById('captureFormSnapshotBtn');
+  if (captureFormSnapshotBtn) {
+    captureFormSnapshotBtn.addEventListener('click', handleCaptureVideoSnapshot);
+  }
+
+  const fsCaptureSnapshotBtn = document.getElementById('fsCaptureSnapshotBtn');
+  if (fsCaptureSnapshotBtn) {
+    fsCaptureSnapshotBtn.addEventListener('click', () => {
+      handleCaptureVideoSnapshot();
+      openBookmarkDrawer();
+    });
+  }
+
+  // 1.38 Image File Upload & Clipboard Paste Support
+  const clipImageFileInput = document.getElementById('clipImageFileInput');
+  if (clipImageFileInput) {
+    clipImageFileInput.addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          const base64 = evt.target.result;
+          const previewBox = document.getElementById('aiVisualPreviewContainer');
+          const previewImg = document.getElementById('aiVisualPreviewImg');
+          const hiddenInput = document.getElementById('aiVisualUrlInput');
+          if (previewImg && previewBox && hiddenInput) {
+            previewImg.src = base64;
+            hiddenInput.value = base64;
+            previewBox.style.display = 'block';
+          }
+          showToast('📁 Image Uploaded & Attached to Clip! 🖼️', 'success');
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  // Global Paste Screenshot (Ctrl + V)
+  window.addEventListener('paste', (e) => {
+    const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+    for (let item of items) {
+      if (item.type.indexOf('image') !== -1) {
+        const blob = item.getAsFile();
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          const base64 = evt.target.result;
+          const previewBox = document.getElementById('aiVisualPreviewContainer');
+          const previewImg = document.getElementById('aiVisualPreviewImg');
+          const hiddenInput = document.getElementById('aiVisualUrlInput');
+          if (previewImg && previewBox && hiddenInput) {
+            previewImg.src = base64;
+            hiddenInput.value = base64;
+            previewBox.style.display = 'block';
+          }
+          showToast('📋 Screenshot Pasted & Attached to Clip! 🖼️', 'success');
+        };
+        reader.readAsDataURL(blob);
+      }
+    }
+  });
 
   const removeAiVisualBtn = document.getElementById('removeAiVisualBtn');
   if (removeAiVisualBtn) {
@@ -1684,9 +1761,24 @@ function setupEventListeners() {
       const input = document.getElementById('aiVisualUrlInput');
       if (container) container.style.display = 'none';
       if (input) input.value = '';
-      showToast('Visual removed from bookmark.', 'info');
+      showToast('Photo removed from bookmark.', 'info');
     });
   }
+
+  // 1.39 Visual Gallery Modal Close Button
+  const closeVisualGalleryBtn = document.getElementById('closeVisualGalleryBtn');
+  if (closeVisualGalleryBtn) {
+    closeVisualGalleryBtn.addEventListener('click', closeVisualGalleryModal);
+  }
+
+  // Escape key closes modals and sheets
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeVisualGalleryModal();
+      closeToolsSheet();
+      closeBookmarkDrawer();
+    }
+  });
 
   // 1.4 Spaced Repetition Due Today Filter Chip
   const dueTodayFilterChip = document.getElementById('dueTodayFilterChip');
@@ -2382,25 +2474,13 @@ CRITICAL INSTRUCTIONS:
       noteTextarea.focus();
     }
 
-    // Render ChatGPT-Style Rich Multimedia AI Flashcard
-    const richBox = document.getElementById('richAiFlashcardBox');
-    const richContent = document.getElementById('chatgptCardContent');
-    if (richBox && richContent) {
-      richContent.innerHTML = formatAiNotesToChatGPTCards(aiNotes, verbatimTranscript);
-      richBox.style.display = 'block';
-    }
-
-    // Auto-generate 3D Visual Diagram for a complete Visual Flashcard
-    const visualInput = document.getElementById('aiVisualUrlInput');
-    if (!visualInput || !visualInput.value) {
-      const topicContext = `${topicTitle || ''} ${verbatimTranscript.substring(0, 120)}`.trim();
-      handleGenerateVisualCard(topicContext);
-    }
+    // Auto-generate Master Image & Deep Study Prompts for custom AI usage
+    generateMasterAIPrompts();
 
     if (fetchedFromTranscriptAPI) {
-      showToast('Exact Subtitles, AI Formulas & Visual Flashcard Generated! 🎯🎴', 'success');
+      showToast('Exact Subtitles, Formulas & AI Prompts Ready! 🎯📋', 'success');
     } else {
-      showToast('Master Teacher Notes, Formulas & Visual Flashcard Generated! ✨🎴', 'success');
+      showToast('Master Teacher Notes, Formulas & AI Prompts Ready! ✨📋', 'success');
     }
   } else {
     showToast('Could not fetch transcript for this timeframe. Please check network connection.', 'error');
@@ -2408,97 +2488,6 @@ CRITICAL INSTRUCTIONS:
 
   if (btn) btn.classList.remove('loading');
   if (btnText) btnText.textContent = '✨ AI Master Notes';
-}
-
-function formatAiNotesToChatGPTCards(rawText, transcriptText) {
-  let html = '';
-
-  // 1. Spoken Transcript Quote
-  if (transcriptText && transcriptText.trim()) {
-    html += `
-      <div class="cg-transcript-block">
-        <div class="cg-transcript-title">📝 Spoken Verbatim Transcript:</div>
-        <div class="cg-transcript-text">"${escapeHtml(transcriptText.trim())}"</div>
-      </div>
-    `;
-  }
-
-  if (!rawText) return html;
-
-  // Process sections
-  const lines = rawText.split('\n');
-  let currentBlock = null;
-  let blockContent = [];
-
-  function flushBlock() {
-    const text = blockContent.join('\n').trim();
-    if (!text) return;
-
-    if (currentBlock === 'teacher') {
-      html += `
-        <div class="cg-teacher-block">
-          <div class="cg-teacher-title">🎓 Master Teacher Conceptual Breakdown</div>
-          <div class="cg-bullet-list">${escapeHtml(text)}</div>
-        </div>
-      `;
-    } else if (currentBlock === 'trick') {
-      html += `
-        <div class="cg-trick-block">
-          <div class="cg-trick-title">⚡ Topper's Secret Shortcut & Trick</div>
-          <div class="cg-bullet-list" style="color: #fef08a;">${escapeHtml(text)}</div>
-        </div>
-      `;
-    } else if (currentBlock === 'trap') {
-      html += `
-        <div class="cg-trap-block">
-          <div class="cg-trap-title">⚠️ Common Exam Trap Alert</div>
-          <div class="cg-bullet-list" style="color: #fca5a5;">${escapeHtml(text)}</div>
-        </div>
-      `;
-    } else if (currentBlock === 'formula') {
-      html += `
-        <div class="cg-formula-block">
-          <div class="cg-formula-title">📐 Must-Remember Formulas & Core Laws</div>
-          <div class="cg-bullet-list" style="color: #e9d5ff; font-weight: 600;">${escapeHtml(text)}</div>
-        </div>
-      `;
-    }
-  }
-
-  lines.forEach(line => {
-    const trimmed = line.trim();
-    if (trimmed.includes('MASTER TEACHER') || trimmed.startsWith('1.')) {
-      flushBlock();
-      currentBlock = 'teacher';
-      blockContent = [];
-    } else if (trimmed.includes('TOPPER') || trimmed.includes('SHORTCUT') || trimmed.startsWith('2.')) {
-      flushBlock();
-      currentBlock = 'trick';
-      blockContent = [];
-    } else if (trimmed.includes('EXAM TRAP') || trimmed.startsWith('3.')) {
-      flushBlock();
-      currentBlock = 'trap';
-      blockContent = [];
-    } else if (trimmed.includes('FORMULA') || trimmed.includes('MUST-REMEMBER') || trimmed.startsWith('4.')) {
-      flushBlock();
-      currentBlock = 'formula';
-      blockContent = [];
-    } else if (trimmed) {
-      blockContent.push(trimmed);
-    }
-  });
-  flushBlock();
-
-  if (!html) {
-    html += `
-      <div class="cg-teacher-block">
-        <div class="cg-teacher-title">🎓 Master Revision Breakdown</div>
-        <div class="cg-bullet-list">${escapeHtml(rawText)}</div>
-      </div>
-    `;
-  }
-
-  return html;
 }
 
 async function transcribeAudioBlobWithGroq(audioBlob) {
@@ -2552,52 +2541,104 @@ async function transcribeAudioBlobWithGroq(audioBlob) {
   }
 }
 
-async function handleGenerateVisualCard(customTopic) {
-  const title = customTopic || document.getElementById('clipTitleInput').value.trim() || appState.currentVideoTitle || 'Science Educational Concept';
-  const subject = document.getElementById('subjectSelect').value || 'Physics';
-  const btn = document.getElementById('genVisualCardBtn');
-  const box = document.getElementById('richAiFlashcardBox');
-  const banner = document.getElementById('chatgptCardBanner');
-  const img = document.getElementById('chatgptCardImg');
-  const input = document.getElementById('aiVisualUrlInput');
+// ==========================================
+// 8.7 Master AI Prompts & Video Snapshot & Visual Gallery
+// ==========================================
 
-  if (btn) btn.innerHTML = '<span>🎨 Drawing 3D Art...</span>';
-  showToast('Generating 3D Concept Diagram for Flashcard... 🎨✨', 'info');
+function generateMasterAIPrompts() {
+  const title = document.getElementById('clipTitleInput').value.trim() || appState.currentVideoTitle || 'Key Educational Concept';
+  const subject = document.getElementById('subjectSelect').value || 'General Science';
+  const chapter = document.getElementById('chapterSelect').value || 'Core Topic';
 
-  try {
-    const cleanTopic = title.replace(/[^\w\s]/gi, ' ').substring(0, 80).trim();
-    const cleanPrompt = encodeURIComponent(`accurate 3D educational concept illustration diagram of ${cleanTopic}, subject: ${subject}, science textbook ray diagram, clear lighting, crisp details, 8k render`);
-    const imageUrl = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=800&height=460&nologo=true&seed=${Date.now()}`;
+  const imagePrompt = `A high-resolution, pristine educational 3D concept illustration and science diagram explaining "${title}" in ${subject} (${chapter}). Clean textbook infographic style, labeled vector diagram, cinematic laboratory lighting, photorealistic details, 8k resolution.`;
+  
+  const studyPrompt = `Act as an expert Master Academic Professor for ${subject} (${chapter}). Please provide an in-depth breakdown of "${title}": 1. Step-by-step intuitive concept explanation with derivations. 2. Topper's calculation shortcuts, speed tricks, and mnemonics. 3. 3 competitive exam-level practice problems with detailed step-by-step solutions and negative marking traps to avoid.`;
 
-    // Preload image
-    const tempImg = new Image();
-    tempImg.onload = () => {
-      if (img && banner && input) {
-        img.src = tempImg.src;
-        input.value = tempImg.src;
-        banner.style.display = 'block';
-        if (box) box.style.display = 'block';
-      }
-      if (btn) btn.innerHTML = '<span>🎨 AI Visual</span>';
-      showToast('🎨 3D Concept Visual Ready! ✨', 'success');
-    };
+  const deck = document.getElementById('aiPromptsDeck');
+  const imgPromptElem = document.getElementById('imagePromptText');
+  const studyPromptElem = document.getElementById('studyPromptText');
 
-    tempImg.onerror = () => {
-      const fallbackUrl = `https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=800&q=80`;
-      if (img && banner && input) {
-        img.src = fallbackUrl;
-        input.value = fallbackUrl;
-        banner.style.display = 'block';
-        if (box) box.style.display = 'block';
-      }
-      if (btn) btn.innerHTML = '<span>🎨 AI Visual</span>';
-    };
+  if (imgPromptElem) imgPromptElem.textContent = imagePrompt;
+  if (studyPromptElem) studyPromptElem.textContent = studyPrompt;
+  if (deck) deck.style.display = 'block';
 
-    tempImg.src = imageUrl;
+  showToast('🎯 Master AI Prompts Generated! (Image & Study)', 'success');
+}
 
-  } catch (err) {
-    if (btn) btn.innerHTML = '<span>🎨 AI Visual</span>';
+function handleCaptureVideoSnapshot() {
+  if (!appState.currentVideoId) {
+    showToast('Please load a YouTube video first!', 'error');
+    return;
   }
+
+  // Grab the exact high-res video player frame thumbnail
+  const videoId = appState.currentVideoId;
+  const snapshotUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+
+  const previewBox = document.getElementById('aiVisualPreviewContainer');
+  const previewImg = document.getElementById('aiVisualPreviewImg');
+  const hiddenInput = document.getElementById('aiVisualUrlInput');
+
+  if (previewImg && previewBox && hiddenInput) {
+    previewImg.src = snapshotUrl;
+    hiddenInput.value = snapshotUrl;
+    previewBox.style.display = 'block';
+  }
+
+  // Also auto-capture current timestamp for start time if empty
+  if (ytPlayer && typeof ytPlayer.getCurrentTime === 'function') {
+    const sec = Math.floor(ytPlayer.getCurrentTime());
+    const startInput = document.getElementById('startTimeInput');
+    const startPreview = document.getElementById('startBtnPreview');
+    const fsStartPreview = document.getElementById('fsStartPreview');
+    if (startInput && !startInput.value) {
+      const timeStr = formatSecondsToTime(sec);
+      startInput.value = timeStr;
+      if (startPreview) startPreview.textContent = timeStr;
+      if (fsStartPreview) fsStartPreview.textContent = timeStr;
+    }
+  }
+
+  showToast('📸 Video Player Slide Snapshot Attached! 🖼️', 'success');
+}
+
+function openVisualGalleryModal(clip) {
+  if (!clip) return;
+  const modal = document.getElementById('clipVisualGalleryModal');
+  const img = document.getElementById('galleryModalImg');
+  const meta = document.getElementById('galleryModalMeta');
+  const heading = document.getElementById('galleryModalHeading');
+  const notes = document.getElementById('galleryModalNotes');
+  const listenBtn = document.getElementById('galleryListenBtn');
+  const playBtn = document.getElementById('galleryPlayVideoBtn');
+
+  if (heading) heading.textContent = clip.title || 'Revision Slide';
+  if (meta) meta.textContent = `${clip.subject || 'General'} • ${clip.chapter || 'Topic'} • ${clip.startTime}${clip.endTime ? ' - ' + clip.endTime : ''} (${clip.tag || 'Concept'})`;
+  if (notes) notes.textContent = clip.note || 'No notes attached. Mastered concept!';
+
+  if (img) {
+    img.src = clip.aiVisualUrl || `https://img.youtube.com/vi/${clip.videoId}/hqdefault.jpg`;
+  }
+
+  if (listenBtn) {
+    listenBtn.onclick = () => {
+      if (clip.note) readOutNoteWithTTS(clip.note);
+    };
+  }
+
+  if (playBtn) {
+    playBtn.onclick = () => {
+      closeVisualGalleryModal();
+      playSpecificClip(clip);
+    };
+  }
+
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeVisualGalleryModal() {
+  const modal = document.getElementById('clipVisualGalleryModal');
+  if (modal) modal.style.display = 'none';
 }
 
 function readOutNoteWithTTS(text) {
@@ -2606,12 +2647,32 @@ function readOutNoteWithTTS(text) {
     return;
   }
   window.speechSynthesis.cancel();
-  const cleanText = text.replace(/[^\w\s.,?!+-/*=]/gi, ' ');
+
+  // Clean markdown and symbols for smooth Hindi voice reading
+  const cleanText = text
+    .replace(/📝|✨|🎓|⚡|⚠️|📐|💡|🔴|🟢|⭐|🏆|🎴/g, '')
+    .replace(/\*|_|#|`|---|---/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
   const utterance = new SpeechSynthesisUtterance(cleanText);
-  utterance.rate = 1.0;
+  utterance.rate = 0.92;
   utterance.pitch = 1.0;
+  utterance.lang = 'hi-IN'; // Indian Hindi
+
+  // Select Indian Hindi voice if available
+  const voices = window.speechSynthesis.getVoices();
+  const hindiVoice = voices.find(v => 
+    (v.lang && (v.lang.includes('hi') || v.lang.includes('HI') || v.lang.includes('hi-IN'))) ||
+    (v.name && (v.name.includes('Hindi') || v.name.includes('हिन्दी') || v.name.includes('Hemant') || v.name.includes('Kalpana') || v.name.includes('Swara') || v.name.includes('Madhur') || v.name.includes('India')))
+  );
+
+  if (hindiVoice) {
+    utterance.voice = hindiVoice;
+  }
+
   window.speechSynthesis.speak(utterance);
-  showToast('🔊 Reading note aloud...', 'info');
+  showToast('🔊 Reading notes in Hindi voice... 🇮🇳', 'info');
 }
 
 function updateDurationPreview() {
