@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RivisionTube - YouTube Lecture Time-Bookmark & Revision Hub</title>
+  <meta name="description" content="YouTube-style lecture player with exact timestamp bookmarking, auto-stop clips, and Firebase cloud synchronization." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  
+  <!-- Firebase App & Firestore via CDN -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+</head>
+<body class="yt-dark-theme">
+
+  <!-- YouTube Top Navigation Bar -->
+  <header class="yt-header">
+    <div class="yt-header-left">
+      <button class="yt-icon-btn yt-menu-toggle" id="toggleSidebarBtn" title="Toggle Sidebar">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path></svg>
+      </button>
+      <div class="yt-brand" id="brandHomeBtn">
+        <div class="yt-logo-box">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="#ff0000"><path d="M21.58 7.19a2.5 2.5 0 0 0-1.76-1.77C18.25 5 12 5 12 5s-6.25 0-7.82.42A2.5 2.5 0 0 0 2.42 7.19C2 8.76 2 12 2 12s0 3.24.42 4.81a2.5 2.5 0 0 0 1.76 1.77C5.75 19 12 19 12 19s6.25 0 7.82-.42a2.5 2.5 0 0 0 1.76-1.77C22 15.24 22 12 22 12s0-3.24-.42-4.81z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" fill="#ffffff"></polygon></svg>
+        </div>
+        <span class="yt-brand-title">Rivision<span>Tube</span></span>
+        <span class="yt-badge-country">PRO</span>
+      </div>
+    </div>
+
+    <!-- YouTube Center Search Bar -->
+    <div class="yt-header-center" id="ytHeaderCenter">
+      <button type="button" class="yt-icon-btn yt-search-back-btn" id="mobileSearchBackBtn" title="Back to Video">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path></svg>
+      </button>
+
+      <form id="topSearchForm" class="yt-search-form">
+        <div class="yt-search-box">
+          <input 
+            type="text" 
+            id="youtubeUrlInput" 
+            class="yt-search-input" 
+            placeholder="Search clips or paste YouTube link..." 
+            required 
+          />
+          <button type="button" class="yt-clear-input-btn" id="clearSearchInputBtn" style="display:none;">✕</button>
+        </div>
+        <button type="submit" class="yt-search-btn" id="topSearchSubmitBtn" title="Load YouTube Video">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path></svg>
+        </button>
+      </form>
+    </div>
+
+    <!-- YouTube Right Actions Bar -->
+    <div class="yt-header-right" id="ytHeaderRight">
+      <!-- Mobile Search Icon Trigger (Visible on Phone) -->
+      <button type="button" class="yt-icon-btn yt-mob-search-trigger" id="mobileSearchTriggerBtn" title="Search">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path></svg>
+      </button>
+
+      <button class="yt-icon-btn" id="exportBtn" title="Export Backup JSON">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"></path></svg>
+      </button>
+
+      <label class="yt-icon-btn file-input-label" title="Import Backup JSON">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"></path></svg>
+        <input type="file" id="importInput" accept=".json" style="display:none;" />
+      </label>
+
+      <!-- Profile Avatar -->
+      <div class="yt-user-avatar" title="Student Study Vault">
+        <span>🎓</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- YouTube Watch Page Layout -->
+  <main class="yt-watch-layout">
+    
+    <!-- PRIMARY COLUMN (Left): Video Player + Lecture Info + Capture Bar -->
+    <div class="yt-primary-col">
+      
+      <!-- Video Player Wrapper (Large 16:9 Cinema) -->
+      <div class="yt-player-container">
+        <div class="player-wrapper" id="playerWrapper">
+          <div id="youtubePlayerContainer">
+            <div class="player-placeholder" id="playerPlaceholder">
+              <div class="placeholder-content">
+                <div class="placeholder-icon">📺</div>
+                <h4>No Lecture Loaded</h4>
+                <p>Paste a YouTube lecture link in the search bar above or click <strong>✨ Demo Data</strong> to start studying!</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Auto-Stop Overlay Alert with Spaced Repetition Recall -->
+          <div class="clip-completed-overlay" id="clipCompleteOverlay">
+            <div class="completed-box">
+              <div class="completed-badge">🎉 CLIP COMPLETED!</div>
+              <h4 id="completedClipTitle">Explanation Finished</h4>
+              <p class="completed-msg">Video automatically stopped at the end of this concept to save your time.</p>
+              
+              <!-- Spaced Repetition Memory Rating -->
+              <div class="sr-recall-card">
+                <div class="sr-recall-title">🧠 Spaced Repetition Recall:</div>
+                <div class="sr-recall-actions">
+                  <button type="button" class="sr-btn sr-btn-hard" id="srHardBtn" title="Struggled to recall - Review tomorrow">🔴 Hard (1d)</button>
+                  <button type="button" class="sr-btn sr-btn-good" id="srGoodBtn" title="Good recall - Review in 3 days">🟢 Good (3d)</button>
+                  <button type="button" class="sr-btn sr-btn-easy" id="srEasyBtn" title="Mastered - Review in 7 days">⭐ Easy (7d)</button>
+                </div>
+              </div>
+
+              <div class="completed-actions">
+                <button class="yt-btn yt-btn-outline" id="replayClipBtn">🔁 Replay Clip</button>
+                <button class="yt-btn yt-btn-primary" id="markDoneAndNextBtn">✅ Next Concept</button>
+                <button class="yt-btn yt-btn-secondary" id="continueVideoBtn">▶ Continue Video</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Floating Fullscreen Timeframe Capture Dock (Compact with ON/OFF) -->
+          <div class="floating-fullscreen-dock" id="floatingFsDock">
+            <div class="fs-dock-expanded" id="fsDockExpanded">
+              <div class="fs-dock-header">
+                <div class="fs-dock-badge">
+                  <span class="live-dot"></span>
+                  <span class="fs-live-time" id="fsLiveTime">00:00:00</span>
+                </div>
+              </div>
+              
+              <div class="fs-dock-actions">
+                <button type="button" class="fs-btn fs-btn-start" id="fsCaptureStartBtn" title="Capture Start Timestamp">
+                  ⚡ Start: <span id="fsStartPreview">--:--</span>
+                </button>
+                <button type="button" class="fs-btn fs-btn-end" id="fsCaptureEndBtn" title="Set Auto-Stop End Timestamp">
+                  ⏹ End: <span id="fsEndPreview">--:--</span>
+                </button>
+                <button type="button" class="fs-btn fs-btn-save" id="fsQuickSaveBtn" title="Save this clip to library">
+                  💾 Save
+                </button>
+                <button type="button" class="fs-btn fs-btn-skip" id="fsSkipFillerBtn" title="Mark Teacher Chit-Chat / Filler Start and End">
+                  🚫 <span id="fsSkipBtnText">Skip Filler</span>
+                </button>
+                <button type="button" class="fs-btn-toggle" id="minimizeFsDockBtn" title="Minimize Dock (Hide)">
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            <!-- Mini Collapsed Trigger Icon (Shown when Dock is Minimized) -->
+            <button type="button" class="fs-dock-mini-trigger" id="expandFsDockBtn" title="Click to Open Timeframe Dock" style="display:none;">
+              ⚡
+            </button>
+          </div>
+        </div>
+
+        <!-- Custom Video Playback & Speed Bar -->
+        <div class="yt-player-controls-bar">
+          <div class="yt-ctrl-group">
+            <button type="button" class="yt-ctrl-btn" id="playPauseToggleBtn" title="Play/Pause Video">
+              <span id="playPauseIcon">▶</span>
+            </button>
+            <button type="button" class="yt-ctrl-btn" id="rewind10Btn" title="Rewind 10s">
+              ⏪ 10s
+            </button>
+            <button type="button" class="yt-ctrl-btn" id="forward10Btn" title="Forward 10s">
+              10s ⏩
+            </button>
+            <div class="yt-time-readout">
+              <span class="live-dot"></span>
+              <span id="liveCurrentTime">00:00:00</span>
+            </div>
+          </div>
+
+          <div class="yt-ctrl-group">
+            <span class="yt-ctrl-label">Speed:</span>
+            <button class="yt-speed-btn" data-speed="1">1x</button>
+            <button class="yt-speed-btn active" data-speed="1.25">1.25x</button>
+            <button class="yt-speed-btn" data-speed="1.5">1.5x</button>
+            <button class="yt-speed-btn" data-speed="2">2x</button>
+          </div>
+
+          <div class="yt-ctrl-group">
+            <button type="button" class="yt-ctrl-btn" id="dockOnOffToggleBtn" title="Toggle Floating Dock ON / OFF">
+              ⚡ Dock: ON
+            </button>
+            <button type="button" class="yt-ctrl-btn" id="theaterModeBtn" title="Toggle Theater View">
+              🔲 Theater
+            </button>
+            <button type="button" class="yt-ctrl-btn yt-btn-accent" id="fullscreenBtn" title="Fullscreen Player">
+              ⛶ Fullscreen
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Video Meta Details & Action Row (YouTube Style) -->
+      <div class="yt-video-info-box">
+        <h1 class="yt-video-title" id="currentLectureTitle">Paste a YouTube lecture link above to start studying 📺</h1>
+
+        <div class="yt-channel-action-row">
+          <!-- Channel / Subject Meta -->
+          <div class="yt-channel-info">
+            <div class="yt-channel-avatar">🎓</div>
+            <div class="yt-channel-meta">
+              <span class="yt-channel-name" id="currentSubjectName">Study Vault Active</span>
+              <span class="yt-sub-count" id="totalSavedClipsMeta">0 revision timestamps saved</span>
+            </div>
+          </div>
+
+          <!-- YouTube-Style Action Buttons Row with Auto-Skip Zone & Tools Sheet -->
+          <div class="yt-action-buttons">
+            <button type="button" class="yt-action-btn yt-btn-capture" id="captureStartBtn" title="Grab current video time for Start">
+              ⚡ Start (<span id="startBtnPreview">--:--</span>)
+            </button>
+            <button type="button" class="yt-action-btn yt-btn-capture-end" id="captureEndBtn" title="Grab current video time for Auto-Stop End">
+              ⏹ End (<span id="endBtnPreview">--:--</span>)
+            </button>
+            <button type="button" class="yt-action-btn yt-btn-save-main" id="openCaptureFormToggleBtn">
+              💾 Bookmark
+            </button>
+            <button type="button" class="yt-action-btn yt-btn-more-tools" id="moreToolsDropdownBtn" title="More Tools & Settings">
+              ⚙️ Tools ▾
+            </button>
+          </div>
+        </div>
+
+        <!-- Auto-Skip Zones Pill Strip (Collapsible - Only opens when user clicks the badge) -->
+        <div class="yt-skip-zones-strip" id="skipZonesStrip" style="display: none;">
+          <div class="skip-strip-header">
+            <span class="skip-strip-title">🚫 <strong>Active Skip Zones for this Lecture:</strong> <span id="skipZonesCountLabel">0 filler zones</span></span>
+            <button type="button" class="yt-link-action" id="closeSkipStripBtn" style="color:#f87171; font-size:0.75rem;">✕ Close</button>
+          </div>
+          <div class="skip-zones-chips-list" id="skipZonesChipsList"></div>
+        </div>
+      </div>
+
+      <!-- Drawer Overlay Backdrop (Mobile Slide-Up Bottom Sheet) -->
+      <div class="drawer-backdrop" id="drawerBackdrop" style="display:none;"></div>
+
+      <!-- YouTube Description & Bookmark Form Box (Desktop Card / Mobile Bottom Sheet Drawer) -->
+      <div class="yt-description-box" id="ytDescriptionBox">
+        <div class="drawer-drag-handle" id="drawerDragHandle"></div>
+        <div class="yt-desc-header">
+          <span class="yt-desc-title">📝 Save Revision Bookmark</span>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="yt-desc-badge" id="durationPreviewBadge">Auto-Stop</span>
+            <button type="button" class="drawer-close-btn" id="closeDrawerBtn" title="Close Drawer">✕</button>
+          </div>
+        </div>
+
+        <form id="saveClipForm" class="yt-bookmark-form">
+          <div class="yt-form-row">
+            <div class="yt-form-group" style="flex: 1;">
+              <label>Start Time <span class="req">*</span></label>
+              <input type="text" id="startTimeInput" class="yt-form-input mono-font" placeholder="00:00:00" required />
+            </div>
+
+            <div class="yt-form-group" style="flex: 1;">
+              <label>End Time (Auto-Stop)</label>
+              <input type="text" id="endTimeInput" class="yt-form-input mono-font" placeholder="00:00:00 (Optional)" />
+            </div>
+
+            <div class="yt-form-group" style="flex: 1.2;">
+              <div class="label-with-action">
+                <label for="subjectSelect">Subject</label>
+                <button type="button" class="yt-link-action" id="addNewSubjectBtn">+ Add</button>
+              </div>
+              <select id="subjectSelect" class="yt-form-select" required>
+                <option value="" disabled selected>Select Subject...</option>
+              </select>
+            </div>
+
+            <div class="yt-form-group" style="flex: 1.2;">
+              <div class="label-with-action">
+                <label for="chapterSelect">Chapter</label>
+                <button type="button" class="yt-link-action" id="addNewChapterBtn">+ Add</button>
+              </div>
+              <select id="chapterSelect" class="yt-form-select" required>
+                <option value="" disabled selected>Select Chapter...</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="yt-form-row">
+            <div class="yt-form-group" style="flex: 2;">
+              <label for="clipTitleInput">Topic / Question Title <span class="req">*</span></label>
+              <input 
+                type="text" 
+                id="clipTitleInput" 
+                class="yt-form-input" 
+                placeholder="e.g. Q4: Tricky Sign Convention in Gauss Law" 
+                required 
+              />
+            </div>
+
+            <div class="yt-form-group" style="flex: 1;">
+              <label for="tagSelect">Tag / Category</label>
+              <select id="tagSelect" class="yt-form-select">
+                <option value="Tricky Question">🔴 Tricky Question</option>
+                <option value="Core Concept">⚡ Core Concept</option>
+                <option value="Formula & Derivation">📐 Formula / Derivation</option>
+                <option value="Teacher's Secret Trick">💡 Teacher's Trick</option>
+                <option value="Exam Trap">⚠️ Common Exam Trap</option>
+                <option value="Doubt / Review">❓ Review Later</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="yt-form-group">
+            <div class="label-with-action">
+              <label for="clipNoteInput">Recall Note / Teacher's Mentor Notes <span class="opt">Optional</span></label>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <button type="button" class="yt-link-action yt-fetch-transcript-btn" id="fetchTranscriptBtn" title="Groq + TranscriptAPI + Gemini Master Teacher Notes">
+                  <span id="fetchTranscriptBtnText">✨ AI Master Notes</span>
+                </button>
+                <button type="button" class="yt-link-action" id="genVisualCardBtn" title="Pollinations FLUX.1: Generate 1024p HD Visual Concept Diagram / Artwork" style="background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3);">
+                  <span>🎨 AI Visual</span>
+                </button>
+              </div>
+            </div>
+            <textarea 
+              id="clipNoteInput" 
+              class="yt-form-textarea" 
+              rows="3" 
+              placeholder="Revision notes... Or click '✨ AI Master Notes' for transcript & formula breakdown, or '🎨 AI Visual' for 3D diagram!"
+            ></textarea>
+            <div id="aiVisualPreviewContainer" style="display: none; margin-top: 8px; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); position: relative;">
+              <img id="aiVisualPreviewImg" src="" alt="AI Visual Diagram" style="width: 100%; max-height: 220px; object-fit: cover; display: block;" />
+              <button type="button" id="removeAiVisualBtn" style="position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.7); color: #fff; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer;">✕</button>
+            </div>
+            <input type="hidden" id="aiVisualUrlInput" />
+          </div>
+
+          <!-- 🎙️ Voice Note Recorder (Teacher's Secret Trick Audio Memo - Up to 2 Minutes) -->
+          <div class="voice-memo-deck">
+            <div class="voice-memo-row">
+              <button type="button" class="voice-record-btn" id="startVoiceRecordBtn" title="Record Voice Memo (Up to 2 Minutes)">
+                <span class="mic-icon">🎤</span> <span id="voiceRecordBtnText">Record Voice Memo</span>
+              </button>
+              <span class="voice-record-timer" id="voiceRecordTimer" style="display:none;">00:00 / 02:00</span>
+              <div class="voice-preview-box" id="voicePreviewBox" style="display:none;">
+                <button type="button" class="voice-play-preview-btn" id="playVoicePreviewBtn">▶ Listen Memo</button>
+                <button type="button" class="voice-delete-btn" id="deleteVoicePreviewBtn" title="Remove voice note">✕</button>
+              </div>
+            </div>
+            <input type="hidden" id="voiceNoteBase64Input" />
+          </div>
+
+          <div class="yt-form-submit-row">
+            <button type="submit" class="yt-btn yt-btn-primary yt-btn-lg" id="saveClipSubmitBtn">
+              💾 Save Clip to Revision Library & Cloud
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+
+    <!-- SECONDARY COLUMN (Right): YouTube "Up Next" Style Revision Clips Playlist -->
+    <div class="yt-secondary-col">
+      
+      <!-- Sticky Sidebar Header with Subject Chips -->
+      <div class="yt-sidebar-header">
+        <div class="yt-sidebar-title-row">
+          <h3>📚 Revision Clips</h3>
+          <span class="yt-badge-count" id="libraryCountBadge">3 saved</span>
+        </div>
+
+        <!-- Subject Filter Pills (YouTube Horizontal Chips + Due Today Spaced Queue) -->
+        <div class="yt-chips-container">
+          <div class="yt-chips-scroll" id="subjectFilterTabs">
+            <button class="yt-chip active" data-subject="all">All</button>
+            <button class="yt-chip yt-chip-due" id="dueTodayFilterChip" data-filter="due-today" title="Clips due for Spaced Repetition revision today">
+              📅 Due Today (<span id="dueTodayCountBadge">0</span>)
+            </button>
+          </div>
+        </div>
+
+        <!-- Tag & Chapter Filter Controls -->
+        <div class="yt-subfilter-row">
+          <select id="chapterFilterSelect" class="yt-mini-select">
+            <option value="all">All Chapters</option>
+          </select>
+          <select id="tagFilterSelect" class="yt-mini-select">
+            <option value="all">All Tags</option>
+            <option value="Tricky Question">🔴 Tricky</option>
+            <option value="Core Concept">⚡ Concept</option>
+            <option value="Formula & Derivation">📐 Formula</option>
+            <option value="Teacher's Secret Trick">💡 Trick</option>
+            <option value="Exam Trap">⚠️ Trap</option>
+            <option value="Doubt / Review">❓ Review</option>
+          </select>
+          <button class="yt-link-action" id="resetFiltersBtn">Reset</button>
+        </div>
+      </div>
+
+      <!-- Revision Clips List (YouTube Video Card List Style) -->
+      <div class="yt-clips-list" id="clipsContainer">
+        <!-- Empty State -->
+        <div class="empty-state" id="emptyLibraryState">
+          <div class="empty-icon">🔖</div>
+          <h3>No Revision Clips Found</h3>
+          <p>Load a lecture video on the left and capture exact timestamps to build your smart revision repository.</p>
+          <button class="yt-btn yt-btn-outline yt-btn-sm" id="loadDemoStateBtn">Load Sample Data</button>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Firebase Setup & Cloud Settings Modal -->
+  <div class="modal-backdrop" id="firebaseModalBackdrop">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="header-title">
+          <span style="font-size: 1.4rem;">🔥</span>
+          <h3>Firebase Cloud Sync Settings</h3>
+        </div>
+        <button class="modal-close-btn" id="closeFirebaseModalBtn">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px;">
+          Apne free Firebase project ke credentials paste karein taaki aapke sare timestamps cloud database me automatically save aur sync hote rahein.
+        </p>
+
+        <form id="firebaseConfigForm">
+          <div class="form-group">
+            <label>Firebase Config JSON / JS Object</label>
+            <textarea 
+              id="firebaseConfigInput" 
+              class="form-textarea mono-font" 
+              rows="6" 
+              placeholder='Paste here from Firebase Console:&#10;{&#10;  apiKey: "AIzaSy...",&#10;  projectId: "your-app-id",&#10;  ...&#10;}'
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Collection / User ID (Optional)</label>
+            <input 
+              type="text" 
+              id="firebaseUserIdInput" 
+              class="form-input" 
+              placeholder="e.g. my_study_vault" 
+              value="my_study_vault" 
+            />
+            <span style="font-size: 0.72rem; color: var(--text-muted);">
+              Aap apne phone aur laptop dono par same ID rakhenge to data dono devices me sync hoga.
+            </span>
+          </div>
+
+          <div class="modal-footer" style="justify-content: space-between; align-items: center;">
+            <button type="button" class="yt-btn yt-btn-outline yt-btn-sm" id="disconnectFirebaseBtn" style="color: #f43f5e;">
+              Disconnect Cloud
+            </button>
+            <div style="display: flex; gap: 8px;">
+              <button type="button" class="yt-btn yt-btn-secondary" id="cancelFirebaseBtn">Cancel</button>
+              <button type="submit" class="yt-btn yt-btn-primary">🔥 Save & Connect</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Clip Modal -->
+  <div class="modal-backdrop" id="editModalBackdrop">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Edit Revision Clip</h3>
+        <button class="modal-close-btn" id="closeEditModalBtn">✕</button>
+      </div>
+      <form id="editClipForm" class="modal-body">
+        <input type="hidden" id="editClipId" />
+        
+        <div class="form-group">
+          <label>Topic / Question Title</label>
+          <input type="text" id="editTitleInput" class="form-input" required />
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label>Start Time (00:00:00)</label>
+            <input type="text" id="editStartTimeInput" class="form-input mono-font" required />
+          </div>
+          <div class="form-group">
+            <label>End Time (Auto-Stop)</label>
+            <input type="text" id="editEndTimeInput" class="form-input mono-font" />
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label>Subject</label>
+            <input type="text" id="editSubjectInput" class="form-input" required />
+          </div>
+          <div class="form-group">
+            <label>Chapter</label>
+            <input type="text" id="editChapterInput" class="form-input" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Category Tag</label>
+          <select id="editTagSelect" class="form-select">
+            <option value="Tricky Question">🔴 Tricky Question</option>
+            <option value="Core Concept">⚡ Core Concept</option>
+            <option value="Formula & Derivation">📐 Formula / Derivation</option>
+            <option value="Teacher's Secret Trick">💡 Teacher's Trick</option>
+            <option value="Exam Trap">⚠️ Common Exam Trap</option>
+            <option value="Doubt / Review">❓ Review Later</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <div class="label-with-action">
+            <label>Recall Note / Solution Hint</label>
+            <button type="button" class="yt-link-action" id="editFetchTranscriptBtn" title="Gemini AI: Auto-generate smart transcript and revision notes for this timeframe">✨ AI Smart Notes</button>
+          </div>
+          <textarea id="editNoteInput" class="form-textarea" rows="3"></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="yt-btn yt-btn-secondary" id="cancelEditBtn">Cancel</button>
+          <button type="submit" class="yt-btn yt-btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Native App-Like Mobile Bottom Navigation Bar (Hidden on Desktop, Visible on Phone) -->
+  <nav class="mobile-bottom-nav" id="mobileBottomNav">
+    <button type="button" class="mob-nav-item active" id="mobNavPlayer" data-target="player">
+      <span class="mob-nav-icon">📺</span>
+      <span class="mob-nav-label">Player</span>
+    </button>
+    <button type="button" class="mob-nav-item mob-nav-bookmark-btn" id="mobNavBookmark" data-target="bookmark">
+      <div class="mob-bookmark-circle">➕</div>
+      <span class="mob-nav-label">Bookmark</span>
+    </button>
+    <button type="button" class="mob-nav-item" id="mobNavClips" data-target="clips">
+      <span class="mob-nav-icon">📚</span>
+      <span class="mob-nav-label">Clips</span>
+      <span class="mob-nav-badge" id="mobClipsBadge">0</span>
+    </button>
+    <button type="button" class="mob-nav-item" id="mobNavDue" data-target="due">
+      <span class="mob-nav-icon">📅</span>
+      <span class="mob-nav-label">Due</span>
+      <span class="mob-nav-badge mob-badge-amber" id="mobDueBadge" style="display:none;">0</span>
+    </button>
+  </nav>
+
+  <!-- YouTube Mobile Tools & Player Controls Slide-Up Bottom Sheet Drawer -->
+  <div class="drawer-backdrop" id="toolsDrawerBackdrop" style="display:none;"></div>
+  <div class="yt-bottom-sheet" id="toolsBottomSheet">
+    <div class="drawer-drag-handle"></div>
+    <div class="bottom-sheet-header">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 1.2rem;">⚙️</span>
+        <span class="bottom-sheet-title">Player Tools & Settings</span>
+      </div>
+      <button type="button" class="drawer-close-btn" id="closeToolsSheetBtn" title="Close Tools">✕</button>
+    </div>
+
+    <div class="bottom-sheet-content">
+      <!-- Playback Speed Section -->
+      <div class="sheet-section">
+        <span class="sheet-section-label">⚡ Playback Speed:</span>
+        <div class="sheet-speed-chips">
+          <button type="button" class="sheet-speed-btn" data-speed="0.75">0.75x</button>
+          <button type="button" class="sheet-speed-btn" data-speed="1">1x</button>
+          <button type="button" class="sheet-speed-btn active" data-speed="1.25">1.25x</button>
+          <button type="button" class="sheet-speed-btn" data-speed="1.5">1.5x</button>
+          <button type="button" class="sheet-speed-btn" data-speed="2">2x</button>
+        </div>
+      </div>
+
+      <!-- Quick Action List Items -->
+      <div class="sheet-menu-list">
+        <button type="button" class="sheet-menu-item" id="skipZoneToggleBtn">
+          <span class="sheet-item-icon">🚫</span>
+          <div class="sheet-item-text">
+            <span class="sheet-item-title" id="skipZoneBtnText">Cut Teacher Chit-Chat / Filler</span>
+            <span class="sheet-item-sub">Teleport over non-educational filler automatically</span>
+          </div>
+        </button>
+
+        <button type="button" class="sheet-menu-item" id="toggleSkipZonesDrawerBtn" style="display:none;">
+          <span class="sheet-item-icon">📋</span>
+          <div class="sheet-item-text">
+            <span class="sheet-item-title" id="skipCountBadgeText">0 Cut Zones Saved</span>
+            <span class="sheet-item-sub">View and manage skip zones for this video</span>
+          </div>
+        </button>
+
+        <button type="button" class="sheet-menu-item" id="quickSkip30sBtn">
+          <span class="sheet-item-icon">⏩</span>
+          <div class="sheet-item-text">
+            <span class="sheet-item-title">Skip 30s Forward</span>
+            <span class="sheet-item-sub">Instantly jump 30 seconds ahead</span>
+          </div>
+        </button>
+
+        <button type="button" class="sheet-menu-item" id="quickSkip1mBtn">
+          <span class="sheet-item-icon">⏩</span>
+          <div class="sheet-item-text">
+            <span class="sheet-item-title">Skip 1 Minute Forward</span>
+            <span class="sheet-item-sub">Instantly jump 60 seconds ahead</span>
+          </div>
+        </button>
+
+        <button type="button" class="sheet-menu-item" id="sheetFullscreenBtn">
+          <span class="sheet-item-icon">⛶</span>
+          <div class="sheet-item-text">
+            <span class="sheet-item-title">Fullscreen Cinema Mode</span>
+            <span class="sheet-item-sub">Watch lecture in immersive fullscreen</span>
+          </div>
+        </button>
+
+        <button type="button" class="sheet-menu-item" id="dockOnOffToggleBtn">
+          <span class="sheet-item-icon">⚡</span>
+          <div class="sheet-item-text">
+            <span class="sheet-item-title">Floating Timeframe Dock</span>
+            <span class="sheet-item-sub">Toggle floating timestamp recorder</span>
+          </div>
+        </button>
+
+        <button type="button" class="sheet-menu-item" id="theaterModeBtn">
+          <span class="sheet-item-icon">🔲</span>
+          <div class="sheet-item-text">
+            <span class="sheet-item-title">Theater View</span>
+            <span class="sheet-item-sub">Expand player width across the screen</span>
+          </div>
+        </button>
+
+        <a href="#" target="_blank" class="sheet-menu-item" id="openExternalYoutubeBtn">
+          <span class="sheet-item-icon">↗</span>
+          <div class="sheet-item-text">
+            <span class="sheet-item-title">Open in YouTube App</span>
+            <span class="sheet-item-sub">Open original lecture in YouTube</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification System -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- YouTube Iframe API Script -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <!-- Application Logic -->
+  <script src="app.js"></script>
+</body>
+</html>

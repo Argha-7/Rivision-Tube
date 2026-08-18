@@ -1,0 +1,15 @@
+# Environment Variables & Secrets
+.env
+.env.local
+.env.*.local
+.github_token
+update.py
+
+# Vercel
+.vercel
+
+# Node & Python caches
+node_modules
+__pycache__
+*.pyc
+.pyrefly_virtual
