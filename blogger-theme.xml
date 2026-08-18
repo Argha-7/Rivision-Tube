@@ -8071,26 +8071,6 @@ function setupEventListeners() {
     });
   }
 
-  // Minimize / Expand Floating Dock
-  const minimizeFsDockBtn = document.getElementById('minimizeFsDockBtn');
-  const expandFsDockBtn = document.getElementById('expandFsDockBtn');
-  const fsDockContainer = document.getElementById('fsFloatingTimeframeDock');
-
-  if (minimizeFsDockBtn && fsDockContainer && expandFsDockBtn) {
-    minimizeFsDockBtn.addEventListener('click', () => {
-      fsDockContainer.style.display = 'none';
-      expandFsDockBtn.style.display = 'flex';
-      showToast('Dock Minimized (Click ⚡ to open)', 'info');
-    });
-  }
-
-  if (expandFsDockBtn && fsDockContainer) {
-    expandFsDockBtn.addEventListener('click', () => {
-      fsDockContainer.style.display = 'flex';
-      expandFsDockBtn.style.display = 'none';
-    });
-  }
-
   // 4. Add New Subject Inline
   document.getElementById('addNewSubjectBtn').addEventListener('click', () => {
     const newSubj = prompt('Enter New Subject Name (e.g. Physics, History, Coding):');
