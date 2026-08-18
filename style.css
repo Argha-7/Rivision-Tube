@@ -645,6 +645,27 @@ body.yt-dark-theme {
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.95), 0 0 30px rgba(56, 189, 248, 0.25) !important;
 }
 
+/* Compact Clip Visual Card Preview */
+.yt-clip-visual {
+  margin-top: 6px;
+  display: inline-block;
+}
+.yt-clip-visual-img {
+  max-width: 140px;
+  height: 75px;
+  object-fit: cover;
+  border-radius: var(--radius-xs);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+  display: block;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.yt-clip-visual-img:hover {
+  transform: scale(1.06);
+  border-color: var(--yt-blue);
+  box-shadow: 0 4px 14px rgba(62, 166, 255, 0.4);
+}
+
 .fs-dock-actions {
   display: flex;
   align-items: center;
