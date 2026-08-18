@@ -679,15 +679,28 @@ body.yt-dark-theme {
   padding: 16px;
 }
 
+/* ==========================================================================
+   Full-Featured Premium Visual Lecture Gallery & Study Vault Modal
+   ========================================================================== */
+
+.visual-gallery-backdrop {
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  background: rgba(0, 0, 0, 0.88) !important;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
 .premium-gallery-box {
-  width: 95vw;
-  max-width: 1280px;
-  height: 86vh;
-  max-height: 880px;
-  background: #101318 !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  width: min(94vw, 860px);
+  max-height: 92vh;
+  background: #11141a !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
   border-radius: var(--radius-lg) !important;
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.98), 0 0 45px rgba(56, 189, 248, 0.25) !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.95), 0 0 35px rgba(56, 189, 248, 0.2) !important;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -698,37 +711,38 @@ body.yt-dark-theme {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 24px;
+  padding: 12px 18px;
   background: rgba(18, 22, 30, 0.98);
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-  flex-wrap: nowrap;
-  gap: 12px;
+  gap: 10px;
   flex-shrink: 0;
 }
 
 .gallery-header-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
 }
 
 .gallery-app-badge {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  font-size: 1.05rem;
+  gap: 6px;
+  font-size: 0.95rem;
   font-weight: 800;
   color: #fff;
   white-space: nowrap;
 }
 
 .gallery-count-pill {
-  font-size: 0.74rem;
+  font-size: 0.7rem;
   font-weight: 700;
   color: var(--yt-blue);
   background: rgba(62, 166, 255, 0.15);
   border: 1px solid rgba(62, 166, 255, 0.35);
-  padding: 3px 10px;
+  padding: 2px 8px;
   border-radius: var(--radius-full);
   white-space: nowrap;
 }
@@ -736,8 +750,8 @@ body.yt-dark-theme {
 .gallery-header-right {
   display: flex;
   align-items: center;
-  gap: 10px;
-  white-space: nowrap;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .gallery-action-btn {
@@ -745,14 +759,14 @@ body.yt-dark-theme {
   border: 1px solid var(--yt-border);
   color: #fff;
   font-family: var(--font-sans);
-  font-size: 0.8rem;
+  font-size: 0.76rem;
   font-weight: 700;
-  padding: 7px 14px;
+  padding: 5px 10px;
   border-radius: var(--radius-sm);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   white-space: nowrap;
   transition: all var(--transition-fast);
 }
@@ -762,8 +776,8 @@ body.yt-dark-theme {
 }
 
 .gallery-btn-listen {
-  background: linear-gradient(135deg, rgba(168, 85, 247, 0.3), rgba(126, 34, 206, 0.4));
-  border-color: rgba(168, 85, 247, 0.6);
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(126, 34, 206, 0.35));
+  border-color: rgba(168, 85, 247, 0.5);
   color: #e9d5ff;
 }
 .gallery-btn-listen:hover {
@@ -772,13 +786,13 @@ body.yt-dark-theme {
 }
 
 .gallery-close-btn {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   color: #fff;
-  font-size: 1.1rem;
+  font-size: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -791,34 +805,27 @@ body.yt-dark-theme {
   transform: rotate(90deg);
 }
 
-/* Gallery Body Grid (Wide & Spacious Split Columns) */
-.premium-gallery-body {
-  display: grid;
-  grid-template-columns: minmax(500px, 1.55fr) minmax(360px, 1fr);
-  gap: 0;
-  overflow: hidden;
-  flex: 1;
-  height: 100%;
-}
-
-.gallery-showcase-column {
-  background: #080a0d;
-  padding: 20px;
+/* Gallery Main Scrollable Container */
+.premium-gallery-scroll-container {
+  padding: 16px 20px;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  position: relative;
-  border-right: 1px solid rgba(255, 255, 255, 0.12);
-  height: 100%;
-  overflow: hidden;
+  gap: 16px;
+}
+
+/* 16:9 High-Res Cinema Stage */
+.gallery-showcase-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .gallery-viewer-stage {
   position: relative;
   width: 100%;
-  flex: 1;
-  min-height: 380px;
+  aspect-ratio: 16 / 9;
+  max-height: 420px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -826,7 +833,7 @@ body.yt-dark-theme {
   overflow: hidden;
   background: #000;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.85);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.85);
 }
 
 .gallery-ambient-glow {
@@ -837,19 +844,17 @@ body.yt-dark-theme {
   bottom: 0;
   background-size: cover;
   background-position: center;
-  filter: blur(50px) brightness(0.35);
-  opacity: 0.75;
-  transform: scale(1.2);
+  filter: blur(40px) brightness(0.35);
+  opacity: 0.7;
+  transform: scale(1.15);
   z-index: 1;
 }
 
 .gallery-stage-img {
   position: relative;
   z-index: 2;
-  max-width: 100%;
-  max-height: 100%;
-  width: auto;
-  height: auto;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   border-radius: var(--radius-xs);
   transition: transform 0.25s ease;
@@ -860,13 +865,13 @@ body.yt-dark-theme {
   top: 50%;
   transform: translateY(-50%);
   z-index: 5;
-  width: 42px;
-  height: 42px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   color: #fff;
-  font-size: 1.1rem;
+  font-size: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -876,40 +881,38 @@ body.yt-dark-theme {
 .stage-nav-btn:hover {
   background: var(--yt-blue);
   color: #000;
-  transform: translateY(-50%) scale(1.12);
+  transform: translateY(-50%) scale(1.1);
 }
-.stage-prev-btn { left: 14px; }
-.stage-next-btn { right: 14px; }
+.stage-prev-btn { left: 10px; }
+.stage-next-btn { right: 10px; }
 
 /* Filmstrip Thumbnails Row */
 .gallery-filmstrip-row {
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   overflow-x: auto;
-  padding: 12px 2px 2px 2px;
-  margin-top: 12px;
-  flex-shrink: 0;
+  padding: 4px 2px;
 }
 .gallery-filmstrip-thumb {
-  width: 80px;
-  height: 48px;
+  width: 76px;
+  height: 46px;
   flex-shrink: 0;
   border-radius: 6px;
   overflow: hidden;
-  border: 2px solid rgba(255, 255, 255, 0.25);
+  border: 2px solid rgba(255, 255, 255, 0.2);
   cursor: pointer;
   background: #000;
   transition: all var(--transition-fast);
 }
 .gallery-filmstrip-thumb:hover {
-  border-color: rgba(62, 166, 255, 0.75);
+  border-color: rgba(62, 166, 255, 0.7);
   transform: translateY(-2px);
 }
 .gallery-filmstrip-thumb.active {
   border-color: var(--yt-blue);
-  box-shadow: 0 0 14px rgba(62, 166, 255, 0.85);
+  box-shadow: 0 0 12px rgba(62, 166, 255, 0.85);
 }
 .gallery-filmstrip-thumb img {
   width: 100%;
@@ -918,58 +921,54 @@ body.yt-dark-theme {
   display: block;
 }
 
-/* Gallery Sidebar Column (Details & Notes) */
-.gallery-sidebar-column {
-  padding: 24px;
+/* Topic Details & Notes Section */
+.gallery-details-section {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  background: #11141a;
-  overflow-y: auto;
-  height: 100%;
+  gap: 12px;
 }
 
-.gallery-meta-tags-row {
+.gallery-title-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
 .gallery-subject-badge {
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   font-weight: 700;
   color: #38bdf8;
   background: rgba(56, 189, 248, 0.15);
-  border: 1px solid rgba(56, 189, 248, 0.35);
-  padding: 4px 10px;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  padding: 3px 8px;
   border-radius: var(--radius-xs);
   text-transform: uppercase;
 }
 
 .gallery-time-badge {
   font-family: var(--font-mono);
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   font-weight: 700;
   color: #facc15;
   background: rgba(234, 179, 8, 0.15);
-  border: 1px solid rgba(234, 179, 8, 0.35);
-  padding: 4px 10px;
+  border: 1px solid rgba(234, 179, 8, 0.3);
+  padding: 3px 8px;
   border-radius: var(--radius-xs);
 }
 
 .gallery-tag-badge {
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   font-weight: 700;
   color: #c084fc;
   background: rgba(192, 132, 252, 0.15);
-  border: 1px solid rgba(192, 132, 252, 0.35);
-  padding: 4px 10px;
+  border: 1px solid rgba(192, 132, 252, 0.3);
+  padding: 3px 8px;
   border-radius: var(--radius-xs);
 }
 
 .gallery-topic-title {
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   font-weight: 800;
   color: #fff;
   line-height: 1.35;
@@ -977,21 +976,23 @@ body.yt-dark-theme {
 }
 
 .gallery-notes-container {
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.45);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-sm);
-  padding: 14px;
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  flex: 1;
+  gap: 8px;
 }
 
 .gallery-notes-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.78rem;
+}
+
+.notes-header-label {
+  font-size: 0.76rem;
   font-weight: 700;
   color: var(--yt-blue);
 }
@@ -1005,22 +1006,17 @@ body.yt-dark-theme {
 }
 
 .gallery-notes-content {
-  font-size: 0.86rem;
+  font-size: 0.84rem;
   color: #f1f5f9;
-  line-height: 1.65;
+  line-height: 1.6;
   white-space: pre-wrap;
-  max-height: 240px;
-  overflow-y: auto;
 }
 
 .gallery-footer-actions {
   display: flex;
   gap: 10px;
   align-items: center;
-  margin-top: auto;
-  padding-top: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  flex-shrink: 0;
+  padding-top: 4px;
 }
 
 .gallery-upload-trigger {
@@ -1028,9 +1024,9 @@ body.yt-dark-theme {
   background: rgba(59, 130, 246, 0.15);
   border: 1px dashed rgba(59, 130, 246, 0.5);
   color: #60a5fa;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 700;
-  padding: 9px 12px;
+  padding: 8px 12px;
   border-radius: var(--radius-sm);
   cursor: pointer;
   display: inline-flex;
@@ -1049,9 +1045,9 @@ body.yt-dark-theme {
   background: var(--yt-bg-elevated);
   border: 1px solid var(--yt-border);
   color: var(--yt-text-primary);
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 700;
-  padding: 9px 14px;
+  padding: 8px 14px;
   border-radius: var(--radius-sm);
   cursor: pointer;
   white-space: nowrap;
@@ -1065,7 +1061,7 @@ body.yt-dark-theme {
   color: #fff;
 }
 
-/* Mobile Responsive Gallery (Under 768px) */
+/* Mobile Responsive Adjustments */
 @media (max-width: 768px) {
   .visual-gallery-backdrop {
     padding: 0;
@@ -1078,24 +1074,15 @@ body.yt-dark-theme {
     border-radius: 20px 20px 0 0 !important;
     border-bottom: none !important;
   }
-  .premium-gallery-body {
-    grid-template-columns: 1fr;
-    overflow-y: auto;
-  }
-  .gallery-showcase-column {
-    border-right: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 12px;
-    height: auto;
-    min-height: auto;
+  .premium-gallery-scroll-container {
+    padding: 12px 14px;
+    gap: 12px;
   }
   .gallery-viewer-stage {
-    min-height: 220px;
-    height: 220px;
+    max-height: 240px;
   }
-  .gallery-sidebar-column {
-    padding: 14px;
-    height: auto;
+  .gallery-header-left {
+    gap: 6px;
   }
 }
 
@@ -4013,15 +4000,28 @@ body.yt-dark-theme {
   padding: 16px;
 }
 
+/* ==========================================================================
+   Full-Featured Premium Visual Lecture Gallery & Study Vault Modal
+   ========================================================================== */
+
+.visual-gallery-backdrop {
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  background: rgba(0, 0, 0, 0.88) !important;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
 .premium-gallery-box {
-  width: 95vw;
-  max-width: 1280px;
-  height: 86vh;
-  max-height: 880px;
-  background: #101318 !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  width: min(94vw, 860px);
+  max-height: 92vh;
+  background: #11141a !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
   border-radius: var(--radius-lg) !important;
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.98), 0 0 45px rgba(56, 189, 248, 0.25) !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.95), 0 0 35px rgba(56, 189, 248, 0.2) !important;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -4032,37 +4032,38 @@ body.yt-dark-theme {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 24px;
+  padding: 12px 18px;
   background: rgba(18, 22, 30, 0.98);
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-  flex-wrap: nowrap;
-  gap: 12px;
+  gap: 10px;
   flex-shrink: 0;
 }
 
 .gallery-header-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
 }
 
 .gallery-app-badge {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  font-size: 1.05rem;
+  gap: 6px;
+  font-size: 0.95rem;
   font-weight: 800;
   color: #fff;
   white-space: nowrap;
 }
 
 .gallery-count-pill {
-  font-size: 0.74rem;
+  font-size: 0.7rem;
   font-weight: 700;
   color: var(--yt-blue);
   background: rgba(62, 166, 255, 0.15);
   border: 1px solid rgba(62, 166, 255, 0.35);
-  padding: 3px 10px;
+  padding: 2px 8px;
   border-radius: var(--radius-full);
   white-space: nowrap;
 }
@@ -4070,8 +4071,8 @@ body.yt-dark-theme {
 .gallery-header-right {
   display: flex;
   align-items: center;
-  gap: 10px;
-  white-space: nowrap;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .gallery-action-btn {
@@ -4079,14 +4080,14 @@ body.yt-dark-theme {
   border: 1px solid var(--yt-border);
   color: #fff;
   font-family: var(--font-sans);
-  font-size: 0.8rem;
+  font-size: 0.76rem;
   font-weight: 700;
-  padding: 7px 14px;
+  padding: 5px 10px;
   border-radius: var(--radius-sm);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   white-space: nowrap;
   transition: all var(--transition-fast);
 }
@@ -4096,8 +4097,8 @@ body.yt-dark-theme {
 }
 
 .gallery-btn-listen {
-  background: linear-gradient(135deg, rgba(168, 85, 247, 0.3), rgba(126, 34, 206, 0.4));
-  border-color: rgba(168, 85, 247, 0.6);
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(126, 34, 206, 0.35));
+  border-color: rgba(168, 85, 247, 0.5);
   color: #e9d5ff;
 }
 .gallery-btn-listen:hover {
@@ -4106,13 +4107,13 @@ body.yt-dark-theme {
 }
 
 .gallery-close-btn {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   color: #fff;
-  font-size: 1.1rem;
+  font-size: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -4125,34 +4126,27 @@ body.yt-dark-theme {
   transform: rotate(90deg);
 }
 
-/* Gallery Body Grid (Wide & Spacious Split Columns) */
-.premium-gallery-body {
-  display: grid;
-  grid-template-columns: minmax(500px, 1.55fr) minmax(360px, 1fr);
-  gap: 0;
-  overflow: hidden;
-  flex: 1;
-  height: 100%;
-}
-
-.gallery-showcase-column {
-  background: #080a0d;
-  padding: 20px;
+/* Gallery Main Scrollable Container */
+.premium-gallery-scroll-container {
+  padding: 16px 20px;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  position: relative;
-  border-right: 1px solid rgba(255, 255, 255, 0.12);
-  height: 100%;
-  overflow: hidden;
+  gap: 16px;
+}
+
+/* 16:9 High-Res Cinema Stage */
+.gallery-showcase-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .gallery-viewer-stage {
   position: relative;
   width: 100%;
-  flex: 1;
-  min-height: 380px;
+  aspect-ratio: 16 / 9;
+  max-height: 420px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -4160,7 +4154,7 @@ body.yt-dark-theme {
   overflow: hidden;
   background: #000;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.85);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.85);
 }
 
 .gallery-ambient-glow {
@@ -4171,19 +4165,17 @@ body.yt-dark-theme {
   bottom: 0;
   background-size: cover;
   background-position: center;
-  filter: blur(50px) brightness(0.35);
-  opacity: 0.75;
-  transform: scale(1.2);
+  filter: blur(40px) brightness(0.35);
+  opacity: 0.7;
+  transform: scale(1.15);
   z-index: 1;
 }
 
 .gallery-stage-img {
   position: relative;
   z-index: 2;
-  max-width: 100%;
-  max-height: 100%;
-  width: auto;
-  height: auto;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   border-radius: var(--radius-xs);
   transition: transform 0.25s ease;
@@ -4194,13 +4186,13 @@ body.yt-dark-theme {
   top: 50%;
   transform: translateY(-50%);
   z-index: 5;
-  width: 42px;
-  height: 42px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   color: #fff;
-  font-size: 1.1rem;
+  font-size: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -4210,40 +4202,38 @@ body.yt-dark-theme {
 .stage-nav-btn:hover {
   background: var(--yt-blue);
   color: #000;
-  transform: translateY(-50%) scale(1.12);
+  transform: translateY(-50%) scale(1.1);
 }
-.stage-prev-btn { left: 14px; }
-.stage-next-btn { right: 14px; }
+.stage-prev-btn { left: 10px; }
+.stage-next-btn { right: 10px; }
 
 /* Filmstrip Thumbnails Row */
 .gallery-filmstrip-row {
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   overflow-x: auto;
-  padding: 12px 2px 2px 2px;
-  margin-top: 12px;
-  flex-shrink: 0;
+  padding: 4px 2px;
 }
 .gallery-filmstrip-thumb {
-  width: 80px;
-  height: 48px;
+  width: 76px;
+  height: 46px;
   flex-shrink: 0;
   border-radius: 6px;
   overflow: hidden;
-  border: 2px solid rgba(255, 255, 255, 0.25);
+  border: 2px solid rgba(255, 255, 255, 0.2);
   cursor: pointer;
   background: #000;
   transition: all var(--transition-fast);
 }
 .gallery-filmstrip-thumb:hover {
-  border-color: rgba(62, 166, 255, 0.75);
+  border-color: rgba(62, 166, 255, 0.7);
   transform: translateY(-2px);
 }
 .gallery-filmstrip-thumb.active {
   border-color: var(--yt-blue);
-  box-shadow: 0 0 14px rgba(62, 166, 255, 0.85);
+  box-shadow: 0 0 12px rgba(62, 166, 255, 0.85);
 }
 .gallery-filmstrip-thumb img {
   width: 100%;
@@ -4252,58 +4242,54 @@ body.yt-dark-theme {
   display: block;
 }
 
-/* Gallery Sidebar Column (Details & Notes) */
-.gallery-sidebar-column {
-  padding: 24px;
+/* Topic Details & Notes Section */
+.gallery-details-section {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  background: #11141a;
-  overflow-y: auto;
-  height: 100%;
+  gap: 12px;
 }
 
-.gallery-meta-tags-row {
+.gallery-title-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
 .gallery-subject-badge {
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   font-weight: 700;
   color: #38bdf8;
   background: rgba(56, 189, 248, 0.15);
-  border: 1px solid rgba(56, 189, 248, 0.35);
-  padding: 4px 10px;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  padding: 3px 8px;
   border-radius: var(--radius-xs);
   text-transform: uppercase;
 }
 
 .gallery-time-badge {
   font-family: var(--font-mono);
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   font-weight: 700;
   color: #facc15;
   background: rgba(234, 179, 8, 0.15);
-  border: 1px solid rgba(234, 179, 8, 0.35);
-  padding: 4px 10px;
+  border: 1px solid rgba(234, 179, 8, 0.3);
+  padding: 3px 8px;
   border-radius: var(--radius-xs);
 }
 
 .gallery-tag-badge {
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   font-weight: 700;
   color: #c084fc;
   background: rgba(192, 132, 252, 0.15);
-  border: 1px solid rgba(192, 132, 252, 0.35);
-  padding: 4px 10px;
+  border: 1px solid rgba(192, 132, 252, 0.3);
+  padding: 3px 8px;
   border-radius: var(--radius-xs);
 }
 
 .gallery-topic-title {
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   font-weight: 800;
   color: #fff;
   line-height: 1.35;
@@ -4311,21 +4297,23 @@ body.yt-dark-theme {
 }
 
 .gallery-notes-container {
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.45);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-sm);
-  padding: 14px;
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  flex: 1;
+  gap: 8px;
 }
 
 .gallery-notes-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.78rem;
+}
+
+.notes-header-label {
+  font-size: 0.76rem;
   font-weight: 700;
   color: var(--yt-blue);
 }
@@ -4339,22 +4327,17 @@ body.yt-dark-theme {
 }
 
 .gallery-notes-content {
-  font-size: 0.86rem;
+  font-size: 0.84rem;
   color: #f1f5f9;
-  line-height: 1.65;
+  line-height: 1.6;
   white-space: pre-wrap;
-  max-height: 240px;
-  overflow-y: auto;
 }
 
 .gallery-footer-actions {
   display: flex;
   gap: 10px;
   align-items: center;
-  margin-top: auto;
-  padding-top: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  flex-shrink: 0;
+  padding-top: 4px;
 }
 
 .gallery-upload-trigger {
@@ -4362,9 +4345,9 @@ body.yt-dark-theme {
   background: rgba(59, 130, 246, 0.15);
   border: 1px dashed rgba(59, 130, 246, 0.5);
   color: #60a5fa;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 700;
-  padding: 9px 12px;
+  padding: 8px 12px;
   border-radius: var(--radius-sm);
   cursor: pointer;
   display: inline-flex;
@@ -4383,9 +4366,9 @@ body.yt-dark-theme {
   background: var(--yt-bg-elevated);
   border: 1px solid var(--yt-border);
   color: var(--yt-text-primary);
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 700;
-  padding: 9px 14px;
+  padding: 8px 14px;
   border-radius: var(--radius-sm);
   cursor: pointer;
   white-space: nowrap;
@@ -4399,7 +4382,7 @@ body.yt-dark-theme {
   color: #fff;
 }
 
-/* Mobile Responsive Gallery (Under 768px) */
+/* Mobile Responsive Adjustments */
 @media (max-width: 768px) {
   .visual-gallery-backdrop {
     padding: 0;
@@ -4412,24 +4395,15 @@ body.yt-dark-theme {
     border-radius: 20px 20px 0 0 !important;
     border-bottom: none !important;
   }
-  .premium-gallery-body {
-    grid-template-columns: 1fr;
-    overflow-y: auto;
-  }
-  .gallery-showcase-column {
-    border-right: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 12px;
-    height: auto;
-    min-height: auto;
+  .premium-gallery-scroll-container {
+    padding: 12px 14px;
+    gap: 12px;
   }
   .gallery-viewer-stage {
-    min-height: 220px;
-    height: 220px;
+    max-height: 240px;
   }
-  .gallery-sidebar-column {
-    padding: 14px;
-    height: auto;
+  .gallery-header-left {
+    gap: 6px;
   }
 }
 
@@ -7269,33 +7243,35 @@ body.yt-dark-theme {
   <div class="modal-backdrop visual-gallery-backdrop" id="clipVisualGalleryModal" style="display:none;">
     <div class="modal-box premium-gallery-box">
       
-      <!-- Gallery Top Navigation Bar -->
+      <!-- Smart Compact Header (Never overflows) -->
       <div class="premium-gallery-header">
         <div class="gallery-header-left">
           <div class="gallery-app-badge">
             <span>🖼️</span>
-            <span class="gallery-badge-title">Visual Lecture Gallery</span>
+            <span class="gallery-badge-title">Visual Slide &amp; Notes</span>
           </div>
+          <span class="gallery-subject-badge" id="galleryModalSubject">Physics</span>
+          <span class="gallery-time-badge" id="galleryModalTime">⏱️ 00:00 - 00:00</span>
           <span class="gallery-count-pill" id="gallerySlideCountPill">1 Slide</span>
         </div>
         <div class="gallery-header-right">
           <button type="button" class="gallery-action-btn" id="galleryPlayVideoBtn" title="Play Video from Timestamp">
-            ▶ Play Clip
+            ▶ Play
           </button>
-          <button type="button" class="gallery-action-btn gallery-btn-listen" id="galleryListenBtn" title="Listen Notes in Hindi">
+          <button type="button" class="gallery-action-btn gallery-btn-listen" id="galleryListenBtn" title="Listen Notes in Hindi Voice">
             🔊 Hindi Voice
           </button>
-          <button type="button" class="gallery-close-btn" id="closeVisualGalleryBtn" title="Close Gallery (Esc)">
+          <button type="button" class="gallery-close-btn" id="closeVisualGalleryBtn" title="Close (Esc)">
             ✕
           </button>
         </div>
       </div>
 
-      <!-- Gallery Main Content (Split / Stack Responsive Layout) -->
-      <div class="premium-gallery-body">
+      <!-- Gallery Main Scrollable Content -->
+      <div class="premium-gallery-scroll-container">
         
-        <!-- Left / Top: High-Res Interactive Image Showcase -->
-        <div class="gallery-showcase-column">
+        <!-- High-Res Interactive Image Showcase Stage -->
+        <div class="gallery-showcase-section">
           <div class="gallery-viewer-stage">
             <!-- Ambient Glow Background -->
             <div class="gallery-ambient-glow" id="galleryAmbientGlow"></div>
@@ -7314,19 +7290,17 @@ body.yt-dark-theme {
           </div>
         </div>
 
-        <!-- Right / Bottom: Topic Meta &amp; Smart Notes Breakdown -->
-        <div class="gallery-sidebar-column">
-          <div class="gallery-meta-tags-row">
-            <span class="gallery-subject-badge" id="galleryModalSubject">Physics</span>
-            <span class="gallery-time-badge" id="galleryModalTime">⏱️ 00:00 - 00:00</span>
+        <!-- Topic Details &amp; Notes Section -->
+        <div class="gallery-details-section">
+          <div class="gallery-title-row">
             <span class="gallery-tag-badge" id="galleryModalTag">⚡ Core Concept</span>
+            <h3 class="gallery-topic-title" id="galleryModalHeading">Topic Title</h3>
           </div>
 
-          <h3 class="gallery-topic-title" id="galleryModalHeading">Topic Title</h3>
-
+          <!-- Notes Box -->
           <div class="gallery-notes-container">
             <div class="gallery-notes-header">
-              <span>📝 Master Teacher Notes &amp; Formulas:</span>
+              <span class="notes-header-label">📝 Master Teacher Notes &amp; Formulas:</span>
               <button type="button" class="copy-prompt-btn" id="copyGalleryNotesBtn" title="Copy Notes">📋 Copy</button>
             </div>
             <div class="gallery-notes-content" id="galleryModalNotes">
@@ -7334,13 +7308,14 @@ body.yt-dark-theme {
             </div>
           </div>
 
+          <!-- Action Footer Strip -->
           <div class="gallery-footer-actions">
             <label class="gallery-upload-trigger" title="Upload additional diagram/photo to this clip">
-              📁 + Add Another Slide
+              <span>📁 + Add Another Slide</span>
               <input type="file" id="galleryAddImageFileInput" accept="image/*" style="display:none;" />
             </label>
-            <button type="button" class="gallery-open-full-link" id="galleryDownloadImgBtn">
-              💾 Save Image
+            <button type="button" class="gallery-open-full-link" id="galleryDownloadImgBtn" title="Open full resolution image in new tab">
+              <span>💾 Save / View Full Image</span>
             </button>
           </div>
         </div>
@@ -7472,7 +7447,7 @@ body.yt-dark-theme {
   <!-- YouTube Iframe API Script -->
   
   <!-- Application Logic -->
-  <script src="app.js?v=3.0.0"></script>
+  <script src="app.js?v=3.1.0"></script>
 
   <!-- YouTube Iframe API Script -->
   <script src="https://www.youtube.com/iframe_api"></script>
