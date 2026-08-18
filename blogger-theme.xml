@@ -6455,7 +6455,7 @@ body.yt-dark-theme {
   <!-- YouTube Iframe API Script -->
   
   <!-- Application Logic -->
-  
+  <script src="app.js?v=2.6.0"></script>
 
   <!-- YouTube Iframe API Script -->
   <script src="https://www.youtube.com/iframe_api"></script>
