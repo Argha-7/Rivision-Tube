@@ -664,10 +664,405 @@ body.yt-dark-theme {
   filter: brightness(1.2);
 }
 
-.gallery-modal-box {
-  background: #121212 !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.95), 0 0 30px rgba(56, 189, 248, 0.25) !important;
+/* ==========================================================================
+   Full-Featured Premium Visual Lecture Gallery & Study Vault Modal
+   ========================================================================== */
+
+.visual-gallery-backdrop {
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  background: rgba(0, 0, 0, 0.88) !important;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.premium-gallery-box {
+  width: 100%;
+  max-width: 1040px;
+  max-height: 92vh;
+  background: #11141a !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.95), 0 0 35px rgba(56, 189, 248, 0.2) !important;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.premium-gallery-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  background: rgba(20, 24, 33, 0.95);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.gallery-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.gallery-app-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.gallery-count-pill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--yt-blue);
+  background: rgba(62, 166, 255, 0.15);
+  border: 1px solid rgba(62, 166, 255, 0.3);
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+}
+
+.gallery-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gallery-action-btn {
+  background: var(--yt-bg-elevated);
+  border: 1px solid var(--yt-border);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all var(--transition-fast);
+}
+.gallery-action-btn:hover {
+  background: var(--yt-bg-hover);
+  border-color: var(--yt-blue);
+}
+
+.gallery-btn-listen {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(126, 34, 206, 0.35));
+  border-color: rgba(168, 85, 247, 0.5);
+  color: #d8b4fe;
+}
+.gallery-btn-listen:hover {
+  background: #a855f7;
+  color: #fff;
+}
+
+.gallery-close-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.gallery-close-btn:hover {
+  background: #f43f5e;
+  border-color: #f43f5e;
+  transform: rotate(90deg);
+}
+
+/* Gallery Body Grid (Responsive Split Columns) */
+.premium-gallery-body {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 0;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.gallery-showcase-column {
+  background: #090b0e;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  min-height: 380px;
+}
+
+.gallery-viewer-stage {
+  position: relative;
+  width: 100%;
+  height: 360px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: #000;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+}
+
+.gallery-ambient-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(40px) brightness(0.4);
+  opacity: 0.7;
+  transform: scale(1.15);
+  z-index: 1;
+}
+
+.gallery-stage-img {
+  position: relative;
+  z-index: 2;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: var(--radius-xs);
+  transition: transform 0.25s ease;
+}
+
+.stage-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.stage-nav-btn:hover {
+  background: var(--yt-blue);
+  color: #000;
+  transform: translateY(-50%) scale(1.1);
+}
+.stage-prev-btn { left: 10px; }
+.stage-next-btn { right: 10px; }
+
+/* Filmstrip Thumbnails Row */
+.gallery-filmstrip-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 12px 2px 2px 2px;
+  margin-top: 10px;
+}
+.gallery-filmstrip-thumb {
+  width: 72px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  background: #000;
+  transition: all var(--transition-fast);
+}
+.gallery-filmstrip-thumb:hover {
+  border-color: rgba(62, 166, 255, 0.7);
+  transform: translateY(-2px);
+}
+.gallery-filmstrip-thumb.active {
+  border-color: var(--yt-blue);
+  box-shadow: 0 0 12px rgba(62, 166, 255, 0.8);
+}
+.gallery-filmstrip-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Gallery Sidebar Column (Details & Notes) */
+.gallery-sidebar-column {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: #11141a;
+}
+
+.gallery-meta-tags-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.gallery-subject-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+  text-transform: uppercase;
+}
+
+.gallery-time-badge {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #facc15;
+  background: rgba(234, 179, 8, 0.15);
+  border: 1px solid rgba(234, 179, 8, 0.3);
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+}
+
+.gallery-tag-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #c084fc;
+  background: rgba(192, 132, 252, 0.15);
+  border: 1px solid rgba(192, 132, 252, 0.3);
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+}
+
+.gallery-topic-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.35;
+  margin: 0;
+}
+
+.gallery-notes-container {
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.gallery-notes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--yt-blue);
+}
+
+.gallery-notes-content {
+  font-size: 0.84rem;
+  color: #f1f5f9;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.gallery-footer-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.gallery-upload-trigger {
+  flex: 1;
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px dashed rgba(59, 130, 246, 0.5);
+  color: #60a5fa;
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all var(--transition-fast);
+}
+.gallery-upload-trigger:hover {
+  background: rgba(59, 130, 246, 0.3);
+  color: #fff;
+}
+
+.gallery-open-full-link {
+  background: var(--yt-bg-elevated);
+  border: 1px solid var(--yt-border);
+  color: var(--yt-text-primary);
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.gallery-open-full-link:hover {
+  background: var(--yt-bg-hover);
+  color: #fff;
+}
+
+/* Mobile Responsive Gallery (Under 768px) */
+@media (max-width: 768px) {
+  .visual-gallery-backdrop {
+    padding: 0;
+    align-items: flex-end;
+  }
+  .premium-gallery-box {
+    max-height: 96vh;
+    border-radius: 20px 20px 0 0 !important;
+    border-bottom: none !important;
+  }
+  .premium-gallery-body {
+    grid-template-columns: 1fr;
+  }
+  .gallery-showcase-column {
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 12px;
+    min-height: auto;
+  }
+  .gallery-viewer-stage {
+    height: 240px;
+  }
+  .gallery-sidebar-column {
+    padding: 14px;
+  }
 }
 
 /* Compact Horizontal Scrollable Visual Strip */
@@ -3569,10 +3964,405 @@ body.yt-dark-theme {
   filter: brightness(1.2);
 }
 
-.gallery-modal-box {
-  background: #121212 !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.95), 0 0 30px rgba(56, 189, 248, 0.25) !important;
+/* ==========================================================================
+   Full-Featured Premium Visual Lecture Gallery & Study Vault Modal
+   ========================================================================== */
+
+.visual-gallery-backdrop {
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  background: rgba(0, 0, 0, 0.88) !important;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.premium-gallery-box {
+  width: 100%;
+  max-width: 1040px;
+  max-height: 92vh;
+  background: #11141a !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.95), 0 0 35px rgba(56, 189, 248, 0.2) !important;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.premium-gallery-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  background: rgba(20, 24, 33, 0.95);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.gallery-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.gallery-app-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.gallery-count-pill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--yt-blue);
+  background: rgba(62, 166, 255, 0.15);
+  border: 1px solid rgba(62, 166, 255, 0.3);
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+}
+
+.gallery-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gallery-action-btn {
+  background: var(--yt-bg-elevated);
+  border: 1px solid var(--yt-border);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all var(--transition-fast);
+}
+.gallery-action-btn:hover {
+  background: var(--yt-bg-hover);
+  border-color: var(--yt-blue);
+}
+
+.gallery-btn-listen {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(126, 34, 206, 0.35));
+  border-color: rgba(168, 85, 247, 0.5);
+  color: #d8b4fe;
+}
+.gallery-btn-listen:hover {
+  background: #a855f7;
+  color: #fff;
+}
+
+.gallery-close-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.gallery-close-btn:hover {
+  background: #f43f5e;
+  border-color: #f43f5e;
+  transform: rotate(90deg);
+}
+
+/* Gallery Body Grid (Responsive Split Columns) */
+.premium-gallery-body {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 0;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.gallery-showcase-column {
+  background: #090b0e;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  min-height: 380px;
+}
+
+.gallery-viewer-stage {
+  position: relative;
+  width: 100%;
+  height: 360px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: #000;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+}
+
+.gallery-ambient-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(40px) brightness(0.4);
+  opacity: 0.7;
+  transform: scale(1.15);
+  z-index: 1;
+}
+
+.gallery-stage-img {
+  position: relative;
+  z-index: 2;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: var(--radius-xs);
+  transition: transform 0.25s ease;
+}
+
+.stage-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.stage-nav-btn:hover {
+  background: var(--yt-blue);
+  color: #000;
+  transform: translateY(-50%) scale(1.1);
+}
+.stage-prev-btn { left: 10px; }
+.stage-next-btn { right: 10px; }
+
+/* Filmstrip Thumbnails Row */
+.gallery-filmstrip-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 12px 2px 2px 2px;
+  margin-top: 10px;
+}
+.gallery-filmstrip-thumb {
+  width: 72px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  background: #000;
+  transition: all var(--transition-fast);
+}
+.gallery-filmstrip-thumb:hover {
+  border-color: rgba(62, 166, 255, 0.7);
+  transform: translateY(-2px);
+}
+.gallery-filmstrip-thumb.active {
+  border-color: var(--yt-blue);
+  box-shadow: 0 0 12px rgba(62, 166, 255, 0.8);
+}
+.gallery-filmstrip-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Gallery Sidebar Column (Details & Notes) */
+.gallery-sidebar-column {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: #11141a;
+}
+
+.gallery-meta-tags-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.gallery-subject-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+  text-transform: uppercase;
+}
+
+.gallery-time-badge {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #facc15;
+  background: rgba(234, 179, 8, 0.15);
+  border: 1px solid rgba(234, 179, 8, 0.3);
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+}
+
+.gallery-tag-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #c084fc;
+  background: rgba(192, 132, 252, 0.15);
+  border: 1px solid rgba(192, 132, 252, 0.3);
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+}
+
+.gallery-topic-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.35;
+  margin: 0;
+}
+
+.gallery-notes-container {
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.gallery-notes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--yt-blue);
+}
+
+.gallery-notes-content {
+  font-size: 0.84rem;
+  color: #f1f5f9;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.gallery-footer-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.gallery-upload-trigger {
+  flex: 1;
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px dashed rgba(59, 130, 246, 0.5);
+  color: #60a5fa;
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all var(--transition-fast);
+}
+.gallery-upload-trigger:hover {
+  background: rgba(59, 130, 246, 0.3);
+  color: #fff;
+}
+
+.gallery-open-full-link {
+  background: var(--yt-bg-elevated);
+  border: 1px solid var(--yt-border);
+  color: var(--yt-text-primary);
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.gallery-open-full-link:hover {
+  background: var(--yt-bg-hover);
+  color: #fff;
+}
+
+/* Mobile Responsive Gallery (Under 768px) */
+@media (max-width: 768px) {
+  .visual-gallery-backdrop {
+    padding: 0;
+    align-items: flex-end;
+  }
+  .premium-gallery-box {
+    max-height: 96vh;
+    border-radius: 20px 20px 0 0 !important;
+    border-bottom: none !important;
+  }
+  .premium-gallery-body {
+    grid-template-columns: 1fr;
+  }
+  .gallery-showcase-column {
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 12px;
+    min-height: auto;
+  }
+  .gallery-viewer-stage {
+    height: 240px;
+  }
+  .gallery-sidebar-column {
+    padding: 14px;
+  }
 }
 
 /* Compact Horizontal Scrollable Visual Strip */
@@ -6407,41 +7197,88 @@ body.yt-dark-theme {
     </div>
   </div>
 
-  <!-- 🖼️ Clip Visual Gallery &amp; Formula Breakdown Modal -->
-  <div class="modal-backdrop" id="clipVisualGalleryModal" style="display:none;">
-    <div class="modal-box gallery-modal-box" style="max-width: 720px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden;">
-      <div class="modal-header">
-        <div class="header-title" style="display: flex; align-items: center; gap: 8px;">
-          <span style="font-size: 1.3rem;">🖼️</span>
-          <h3 id="galleryModalTitle">Lecture Visual Slide &amp; Formulas</h3>
+  <!-- 🖼️ Full-Featured Premium Visual Lecture Gallery &amp; Study Vault Modal -->
+  <div class="modal-backdrop visual-gallery-backdrop" id="clipVisualGalleryModal" style="display:none;">
+    <div class="modal-box premium-gallery-box">
+      
+      <!-- Gallery Top Navigation Bar -->
+      <div class="premium-gallery-header">
+        <div class="gallery-header-left">
+          <div class="gallery-app-badge">
+            <span>🖼️</span>
+            <span class="gallery-badge-title">Visual Lecture Gallery</span>
+          </div>
+          <span class="gallery-count-pill" id="gallerySlideCountPill">1 Slide</span>
         </div>
-        <button class="modal-close-btn" id="closeVisualGalleryBtn" title="Close Gallery (Esc)">✕</button>
+        <div class="gallery-header-right">
+          <button type="button" class="gallery-action-btn" id="galleryPlayVideoBtn" title="Play Video from Timestamp">
+            ▶ Play Clip
+          </button>
+          <button type="button" class="gallery-action-btn gallery-btn-listen" id="galleryListenBtn" title="Listen Notes in Hindi">
+            🔊 Hindi Voice
+          </button>
+          <button type="button" class="gallery-close-btn" id="closeVisualGalleryBtn" title="Close Gallery (Esc)">
+            ✕
+          </button>
+        </div>
       </div>
-      <div class="modal-body gallery-modal-body" style="padding: 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px;">
-        <div class="gallery-image-wrapper" style="width: 100%; border-radius: var(--radius-sm); overflow: hidden; background: #000; border: 1px solid rgba(255,255,255,0.1); max-height: 380px; display: flex; align-items: center; justify-content: center;">
-          <img id="galleryModalImg" src="" alt="Lecture Slide Snapshot" style="max-width: 100%; max-height: 380px; object-fit: contain; display: block;" />
-        </div>
+
+      <!-- Gallery Main Content (Split / Stack Responsive Layout) -->
+      <div class="premium-gallery-body">
         
-        <div class="gallery-details-wrapper" style="display: flex; flex-direction: column; gap: 8px;">
-          <div class="gallery-meta-row" id="galleryModalMeta" style="font-size: 0.75rem; color: var(--yt-blue); font-weight: 700; text-transform: uppercase;">
-            Physics • Gauss Law • 02:15 - 04:00
+        <!-- Left / Top: High-Res Interactive Image Showcase -->
+        <div class="gallery-showcase-column">
+          <div class="gallery-viewer-stage">
+            <!-- Ambient Glow Background -->
+            <div class="gallery-ambient-glow" id="galleryAmbientGlow"></div>
+            
+            <!-- Main Featured Image -->
+            <img id="galleryModalImg" src="" alt="Lecture Slide Snapshot" class="gallery-stage-img" />
+            
+            <!-- Navigation Arrows (Shown when multi-images exist) -->
+            <button type="button" class="stage-nav-btn stage-prev-btn" id="galleryPrevImgBtn" style="display:none;" title="Previous Image">◀</button>
+            <button type="button" class="stage-nav-btn stage-next-btn" id="galleryNextImgBtn" style="display:none;" title="Next Image">▶</button>
           </div>
-          <h4 id="galleryModalHeading" style="font-size: 1.05rem; font-weight: 700; color: #fff; margin: 0;">Topic Title</h4>
-          
-          <div class="gallery-notes-box" id="galleryModalNotes" style="font-size: 0.82rem; color: var(--yt-text-primary); line-height: 1.5; background: rgba(0,0,0,0.5); padding: 10px 12px; border-radius: var(--radius-xs); border-left: 3px solid var(--yt-blue); white-space: pre-wrap;">
-            Formulas and notes will appear here...
+
+          <!-- Horizontal Thumbnails Filmstrip -->
+          <div class="gallery-filmstrip-row" id="galleryFilmstripRow" style="display:none;">
+            <!-- Thumbnails rendered dynamically here -->
           </div>
-          
-          <div class="gallery-actions-row" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px;">
-            <button type="button" class="yt-btn yt-btn-primary yt-btn-sm" id="galleryListenBtn" style="background: linear-gradient(135deg, #9333ea, #7e22ce);">
-              🔊 Listen Notes (Hindi)
-            </button>
-            <button type="button" class="yt-btn yt-btn-secondary yt-btn-sm" id="galleryPlayVideoBtn">
-              ▶ Play Timestamp
+        </div>
+
+        <!-- Right / Bottom: Topic Meta &amp; Smart Notes Breakdown -->
+        <div class="gallery-sidebar-column">
+          <div class="gallery-meta-tags-row">
+            <span class="gallery-subject-badge" id="galleryModalSubject">Physics</span>
+            <span class="gallery-time-badge" id="galleryModalTime">⏱️ 00:00 - 00:00</span>
+            <span class="gallery-tag-badge" id="galleryModalTag">⚡ Core Concept</span>
+          </div>
+
+          <h3 class="gallery-topic-title" id="galleryModalHeading">Topic Title</h3>
+
+          <div class="gallery-notes-container">
+            <div class="gallery-notes-header">
+              <span>📝 Master Teacher Notes &amp; Formulas:</span>
+              <button type="button" class="copy-prompt-btn" id="copyGalleryNotesBtn" title="Copy Notes">📋 Copy</button>
+            </div>
+            <div class="gallery-notes-content" id="galleryModalNotes">
+              Notes and formulas will appear here...
+            </div>
+          </div>
+
+          <div class="gallery-footer-actions">
+            <label class="gallery-upload-trigger" title="Upload additional diagram/photo to this clip">
+              📁 + Add Another Slide
+              <input type="file" id="galleryAddImageFileInput" accept="image/*" style="display:none;" />
+            </label>
+            <button type="button" class="gallery-open-full-link" id="galleryDownloadImgBtn">
+              💾 Save Image
             </button>
           </div>
         </div>
+
       </div>
+
     </div>
   </div>
 
@@ -6567,7 +7404,7 @@ body.yt-dark-theme {
   <!-- YouTube Iframe API Script -->
   
   <!-- Application Logic -->
-  <script src="app.js?v=2.8.0"></script>
+  <script src="app.js?v=2.9.0"></script>
 
   <!-- YouTube Iframe API Script -->
   <script src="https://www.youtube.com/iframe_api"></script>
@@ -9195,22 +10032,136 @@ function handleCaptureVideoSnapshot() {
   showToast('📸 Video Player Slide Snapshot Attached! 🖼️', 'success');
 }
 
+let currentGalleryImages = [];
+let currentGalleryIndex = 0;
+
 function openVisualGalleryModal(clip, specificImg = null) {
   if (!clip) return;
   const modal = document.getElementById('clipVisualGalleryModal');
   const img = document.getElementById('galleryModalImg');
-  const meta = document.getElementById('galleryModalMeta');
+  const ambientGlow = document.getElementById('galleryAmbientGlow');
+  const subjectBadge = document.getElementById('galleryModalSubject');
+  const timeBadge = document.getElementById('galleryModalTime');
+  const tagBadge = document.getElementById('galleryModalTag');
   const heading = document.getElementById('galleryModalHeading');
   const notes = document.getElementById('galleryModalNotes');
   const listenBtn = document.getElementById('galleryListenBtn');
   const playBtn = document.getElementById('galleryPlayVideoBtn');
+  const filmstripRow = document.getElementById('galleryFilmstripRow');
+  const countPill = document.getElementById('gallerySlideCountPill');
+  const prevBtn = document.getElementById('galleryPrevImgBtn');
+  const nextBtn = document.getElementById('galleryNextImgBtn');
+  const copyNotesBtn = document.getElementById('copyGalleryNotesBtn');
+  const downloadImgBtn = document.getElementById('galleryDownloadImgBtn');
+  const addImageInput = document.getElementById('galleryAddImageFileInput');
 
   if (heading) heading.textContent = clip.title || 'Revision Slide';
-  if (meta) meta.textContent = `${clip.subject || 'General'} • ${clip.chapter || 'Topic'} • ${clip.startTime}${clip.endTime ? ' - ' + clip.endTime : ''} (${clip.tag || 'Concept'})`;
-  if (notes) notes.textContent = clip.note || 'No notes attached. Mastered concept!';
+  if (subjectBadge) subjectBadge.textContent = clip.subject || 'General';
+  if (timeBadge) timeBadge.textContent = `⏱️ ${clip.startTime}${clip.endTime ? ' - ' + clip.endTime : ''}`;
+  if (tagBadge) tagBadge.textContent = clip.tag || '⚡ Concept';
+  if (notes) notes.textContent = clip.note || 'No additional notes attached. Mastered concept!';
 
-  if (img) {
-    img.src = specificImg || clip.aiVisualUrl || `https://img.youtube.com/vi/${clip.videoId}/hqdefault.jpg`;
+  // Gather all images for this clip
+  const allImages = [];
+  if (clip.aiVisualUrl) allImages.push(clip.aiVisualUrl);
+  if (clip.visualImages && Array.isArray(clip.visualImages)) {
+    clip.visualImages.forEach(u => {
+      if (u && !allImages.includes(u)) allImages.push(u);
+    });
+  }
+  if (allImages.length === 0) {
+    allImages.push(`https://img.youtube.com/vi/${clip.videoId}/hqdefault.jpg`);
+  }
+
+  currentGalleryImages = allImages;
+  currentGalleryIndex = specificImg ? Math.max(0, allImages.indexOf(specificImg)) : 0;
+  if (currentGalleryIndex === -1) currentGalleryIndex = 0;
+
+  function updateGalleryDisplay() {
+    const activeUrl = currentGalleryImages[currentGalleryIndex];
+    if (img) img.src = activeUrl;
+    if (ambientGlow) ambientGlow.style.backgroundImage = `url("${activeUrl}")`;
+    if (countPill) countPill.textContent = `${currentGalleryIndex + 1} of ${currentGalleryImages.length} Slide${currentGalleryImages.length > 1 ? 's' : ''}`;
+
+    // Prev / Next Buttons
+    if (prevBtn) prevBtn.style.display = currentGalleryImages.length > 1 ? 'flex' : 'none';
+    if (nextBtn) nextBtn.style.display = currentGalleryImages.length > 1 ? 'flex' : 'none';
+
+    // Filmstrip Thumbnails
+    if (filmstripRow) {
+      if (currentGalleryImages.length > 1) {
+        filmstripRow.style.display = 'flex';
+        filmstripRow.innerHTML = '';
+        currentGalleryImages.forEach((u, idx) => {
+          const thumb = document.createElement('div');
+          thumb.className = `gallery-filmstrip-thumb ${idx === currentGalleryIndex ? 'active' : ''}`;
+          thumb.innerHTML = `<img src="${u}" alt="Thumbnail" />`;
+          thumb.onclick = () => {
+            currentGalleryIndex = idx;
+            updateGalleryDisplay();
+          };
+          filmstripRow.appendChild(thumb);
+        });
+      } else {
+        filmstripRow.style.display = 'none';
+      }
+    }
+  }
+
+  updateGalleryDisplay();
+
+  if (prevBtn) {
+    prevBtn.onclick = () => {
+      currentGalleryIndex = (currentGalleryIndex - 1 + currentGalleryImages.length) % currentGalleryImages.length;
+      updateGalleryDisplay();
+    };
+  }
+
+  if (nextBtn) {
+    nextBtn.onclick = () => {
+      currentGalleryIndex = (currentGalleryIndex + 1) % currentGalleryImages.length;
+      updateGalleryDisplay();
+    };
+  }
+
+  if (copyNotesBtn) {
+    copyNotesBtn.onclick = () => {
+      if (clip.note) {
+        navigator.clipboard.writeText(clip.note);
+        copyNotesBtn.textContent = '✅ Copied!';
+        setTimeout(() => copyNotesBtn.textContent = '📋 Copy', 1500);
+        showToast('📋 Notes Copied to Clipboard!', 'success');
+      }
+    };
+  }
+
+  if (downloadImgBtn) {
+    downloadImgBtn.onclick = () => {
+      const activeUrl = currentGalleryImages[currentGalleryIndex];
+      window.open(activeUrl, '_blank');
+    };
+  }
+
+  if (addImageInput) {
+    addImageInput.onchange = (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          const b64 = evt.target.result;
+          if (!clip.visualImages) clip.visualImages = [];
+          if (!clip.visualImages.includes(b64)) clip.visualImages.push(b64);
+          if (!clip.aiVisualUrl) clip.aiVisualUrl = b64;
+          saveStateToStorage(true);
+          renderLibrary();
+          currentGalleryImages.push(b64);
+          currentGalleryIndex = currentGalleryImages.length - 1;
+          updateGalleryDisplay();
+          showToast('📸 Additional Slide Added to Clip!', 'success');
+        };
+        reader.readAsDataURL(file);
+      }
+    };
   }
 
   if (listenBtn) {

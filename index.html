@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=2.8.0" />
+  <link rel="stylesheet" href="style.css?v=2.9.0" />
   
   <!-- Firebase App & Firestore via CDN -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -589,41 +589,88 @@
     </div>
   </div>
 
-  <!-- 🖼️ Clip Visual Gallery & Formula Breakdown Modal -->
-  <div class="modal-backdrop" id="clipVisualGalleryModal" style="display:none;">
-    <div class="modal-box gallery-modal-box" style="max-width: 720px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden;">
-      <div class="modal-header">
-        <div class="header-title" style="display: flex; align-items: center; gap: 8px;">
-          <span style="font-size: 1.3rem;">🖼️</span>
-          <h3 id="galleryModalTitle">Lecture Visual Slide & Formulas</h3>
+  <!-- 🖼️ Full-Featured Premium Visual Lecture Gallery & Study Vault Modal -->
+  <div class="modal-backdrop visual-gallery-backdrop" id="clipVisualGalleryModal" style="display:none;">
+    <div class="modal-box premium-gallery-box">
+      
+      <!-- Gallery Top Navigation Bar -->
+      <div class="premium-gallery-header">
+        <div class="gallery-header-left">
+          <div class="gallery-app-badge">
+            <span>🖼️</span>
+            <span class="gallery-badge-title">Visual Lecture Gallery</span>
+          </div>
+          <span class="gallery-count-pill" id="gallerySlideCountPill">1 Slide</span>
         </div>
-        <button class="modal-close-btn" id="closeVisualGalleryBtn" title="Close Gallery (Esc)">✕</button>
+        <div class="gallery-header-right">
+          <button type="button" class="gallery-action-btn" id="galleryPlayVideoBtn" title="Play Video from Timestamp">
+            ▶ Play Clip
+          </button>
+          <button type="button" class="gallery-action-btn gallery-btn-listen" id="galleryListenBtn" title="Listen Notes in Hindi">
+            🔊 Hindi Voice
+          </button>
+          <button type="button" class="gallery-close-btn" id="closeVisualGalleryBtn" title="Close Gallery (Esc)">
+            ✕
+          </button>
+        </div>
       </div>
-      <div class="modal-body gallery-modal-body" style="padding: 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px;">
-        <div class="gallery-image-wrapper" style="width: 100%; border-radius: var(--radius-sm); overflow: hidden; background: #000; border: 1px solid rgba(255,255,255,0.1); max-height: 380px; display: flex; align-items: center; justify-content: center;">
-          <img id="galleryModalImg" src="" alt="Lecture Slide Snapshot" style="max-width: 100%; max-height: 380px; object-fit: contain; display: block;" />
-        </div>
+
+      <!-- Gallery Main Content (Split / Stack Responsive Layout) -->
+      <div class="premium-gallery-body">
         
-        <div class="gallery-details-wrapper" style="display: flex; flex-direction: column; gap: 8px;">
-          <div class="gallery-meta-row" id="galleryModalMeta" style="font-size: 0.75rem; color: var(--yt-blue); font-weight: 700; text-transform: uppercase;">
-            Physics • Gauss Law • 02:15 - 04:00
+        <!-- Left / Top: High-Res Interactive Image Showcase -->
+        <div class="gallery-showcase-column">
+          <div class="gallery-viewer-stage">
+            <!-- Ambient Glow Background -->
+            <div class="gallery-ambient-glow" id="galleryAmbientGlow"></div>
+            
+            <!-- Main Featured Image -->
+            <img id="galleryModalImg" src="" alt="Lecture Slide Snapshot" class="gallery-stage-img" />
+            
+            <!-- Navigation Arrows (Shown when multi-images exist) -->
+            <button type="button" class="stage-nav-btn stage-prev-btn" id="galleryPrevImgBtn" style="display:none;" title="Previous Image">◀</button>
+            <button type="button" class="stage-nav-btn stage-next-btn" id="galleryNextImgBtn" style="display:none;" title="Next Image">▶</button>
           </div>
-          <h4 id="galleryModalHeading" style="font-size: 1.05rem; font-weight: 700; color: #fff; margin: 0;">Topic Title</h4>
-          
-          <div class="gallery-notes-box" id="galleryModalNotes" style="font-size: 0.82rem; color: var(--yt-text-primary); line-height: 1.5; background: rgba(0,0,0,0.5); padding: 10px 12px; border-radius: var(--radius-xs); border-left: 3px solid var(--yt-blue); white-space: pre-wrap;">
-            Formulas and notes will appear here...
+
+          <!-- Horizontal Thumbnails Filmstrip -->
+          <div class="gallery-filmstrip-row" id="galleryFilmstripRow" style="display:none;">
+            <!-- Thumbnails rendered dynamically here -->
           </div>
-          
-          <div class="gallery-actions-row" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px;">
-            <button type="button" class="yt-btn yt-btn-primary yt-btn-sm" id="galleryListenBtn" style="background: linear-gradient(135deg, #9333ea, #7e22ce);">
-              🔊 Listen Notes (Hindi)
-            </button>
-            <button type="button" class="yt-btn yt-btn-secondary yt-btn-sm" id="galleryPlayVideoBtn">
-              ▶ Play Timestamp
+        </div>
+
+        <!-- Right / Bottom: Topic Meta & Smart Notes Breakdown -->
+        <div class="gallery-sidebar-column">
+          <div class="gallery-meta-tags-row">
+            <span class="gallery-subject-badge" id="galleryModalSubject">Physics</span>
+            <span class="gallery-time-badge" id="galleryModalTime">⏱️ 00:00 - 00:00</span>
+            <span class="gallery-tag-badge" id="galleryModalTag">⚡ Core Concept</span>
+          </div>
+
+          <h3 class="gallery-topic-title" id="galleryModalHeading">Topic Title</h3>
+
+          <div class="gallery-notes-container">
+            <div class="gallery-notes-header">
+              <span>📝 Master Teacher Notes & Formulas:</span>
+              <button type="button" class="copy-prompt-btn" id="copyGalleryNotesBtn" title="Copy Notes">📋 Copy</button>
+            </div>
+            <div class="gallery-notes-content" id="galleryModalNotes">
+              Notes and formulas will appear here...
+            </div>
+          </div>
+
+          <div class="gallery-footer-actions">
+            <label class="gallery-upload-trigger" title="Upload additional diagram/photo to this clip">
+              📁 + Add Another Slide
+              <input type="file" id="galleryAddImageFileInput" accept="image/*" style="display:none;" />
+            </label>
+            <button type="button" class="gallery-open-full-link" id="galleryDownloadImgBtn">
+              💾 Save Image
             </button>
           </div>
         </div>
+
       </div>
+
     </div>
   </div>
 
@@ -749,6 +796,6 @@
   <!-- YouTube Iframe API Script -->
   <script src="https://www.youtube.com/iframe_api"></script>
   <!-- Application Logic -->
-  <script src="app.js?v=2.8.0"></script>
+  <script src="app.js?v=2.9.0"></script>
 </body>
 </html>

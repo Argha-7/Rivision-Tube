@@ -2618,22 +2618,136 @@ function handleCaptureVideoSnapshot() {
   showToast('📸 Video Player Slide Snapshot Attached! 🖼️', 'success');
 }
 
+let currentGalleryImages = [];
+let currentGalleryIndex = 0;
+
 function openVisualGalleryModal(clip, specificImg = null) {
   if (!clip) return;
   const modal = document.getElementById('clipVisualGalleryModal');
   const img = document.getElementById('galleryModalImg');
-  const meta = document.getElementById('galleryModalMeta');
+  const ambientGlow = document.getElementById('galleryAmbientGlow');
+  const subjectBadge = document.getElementById('galleryModalSubject');
+  const timeBadge = document.getElementById('galleryModalTime');
+  const tagBadge = document.getElementById('galleryModalTag');
   const heading = document.getElementById('galleryModalHeading');
   const notes = document.getElementById('galleryModalNotes');
   const listenBtn = document.getElementById('galleryListenBtn');
   const playBtn = document.getElementById('galleryPlayVideoBtn');
+  const filmstripRow = document.getElementById('galleryFilmstripRow');
+  const countPill = document.getElementById('gallerySlideCountPill');
+  const prevBtn = document.getElementById('galleryPrevImgBtn');
+  const nextBtn = document.getElementById('galleryNextImgBtn');
+  const copyNotesBtn = document.getElementById('copyGalleryNotesBtn');
+  const downloadImgBtn = document.getElementById('galleryDownloadImgBtn');
+  const addImageInput = document.getElementById('galleryAddImageFileInput');
 
   if (heading) heading.textContent = clip.title || 'Revision Slide';
-  if (meta) meta.textContent = `${clip.subject || 'General'} • ${clip.chapter || 'Topic'} • ${clip.startTime}${clip.endTime ? ' - ' + clip.endTime : ''} (${clip.tag || 'Concept'})`;
-  if (notes) notes.textContent = clip.note || 'No notes attached. Mastered concept!';
+  if (subjectBadge) subjectBadge.textContent = clip.subject || 'General';
+  if (timeBadge) timeBadge.textContent = `⏱️ ${clip.startTime}${clip.endTime ? ' - ' + clip.endTime : ''}`;
+  if (tagBadge) tagBadge.textContent = clip.tag || '⚡ Concept';
+  if (notes) notes.textContent = clip.note || 'No additional notes attached. Mastered concept!';
 
-  if (img) {
-    img.src = specificImg || clip.aiVisualUrl || `https://img.youtube.com/vi/${clip.videoId}/hqdefault.jpg`;
+  // Gather all images for this clip
+  const allImages = [];
+  if (clip.aiVisualUrl) allImages.push(clip.aiVisualUrl);
+  if (clip.visualImages && Array.isArray(clip.visualImages)) {
+    clip.visualImages.forEach(u => {
+      if (u && !allImages.includes(u)) allImages.push(u);
+    });
+  }
+  if (allImages.length === 0) {
+    allImages.push(`https://img.youtube.com/vi/${clip.videoId}/hqdefault.jpg`);
+  }
+
+  currentGalleryImages = allImages;
+  currentGalleryIndex = specificImg ? Math.max(0, allImages.indexOf(specificImg)) : 0;
+  if (currentGalleryIndex === -1) currentGalleryIndex = 0;
+
+  function updateGalleryDisplay() {
+    const activeUrl = currentGalleryImages[currentGalleryIndex];
+    if (img) img.src = activeUrl;
+    if (ambientGlow) ambientGlow.style.backgroundImage = `url("${activeUrl}")`;
+    if (countPill) countPill.textContent = `${currentGalleryIndex + 1} of ${currentGalleryImages.length} Slide${currentGalleryImages.length > 1 ? 's' : ''}`;
+
+    // Prev / Next Buttons
+    if (prevBtn) prevBtn.style.display = currentGalleryImages.length > 1 ? 'flex' : 'none';
+    if (nextBtn) nextBtn.style.display = currentGalleryImages.length > 1 ? 'flex' : 'none';
+
+    // Filmstrip Thumbnails
+    if (filmstripRow) {
+      if (currentGalleryImages.length > 1) {
+        filmstripRow.style.display = 'flex';
+        filmstripRow.innerHTML = '';
+        currentGalleryImages.forEach((u, idx) => {
+          const thumb = document.createElement('div');
+          thumb.className = `gallery-filmstrip-thumb ${idx === currentGalleryIndex ? 'active' : ''}`;
+          thumb.innerHTML = `<img src="${u}" alt="Thumbnail" />`;
+          thumb.onclick = () => {
+            currentGalleryIndex = idx;
+            updateGalleryDisplay();
+          };
+          filmstripRow.appendChild(thumb);
+        });
+      } else {
+        filmstripRow.style.display = 'none';
+      }
+    }
+  }
+
+  updateGalleryDisplay();
+
+  if (prevBtn) {
+    prevBtn.onclick = () => {
+      currentGalleryIndex = (currentGalleryIndex - 1 + currentGalleryImages.length) % currentGalleryImages.length;
+      updateGalleryDisplay();
+    };
+  }
+
+  if (nextBtn) {
+    nextBtn.onclick = () => {
+      currentGalleryIndex = (currentGalleryIndex + 1) % currentGalleryImages.length;
+      updateGalleryDisplay();
+    };
+  }
+
+  if (copyNotesBtn) {
+    copyNotesBtn.onclick = () => {
+      if (clip.note) {
+        navigator.clipboard.writeText(clip.note);
+        copyNotesBtn.textContent = '✅ Copied!';
+        setTimeout(() => copyNotesBtn.textContent = '📋 Copy', 1500);
+        showToast('📋 Notes Copied to Clipboard!', 'success');
+      }
+    };
+  }
+
+  if (downloadImgBtn) {
+    downloadImgBtn.onclick = () => {
+      const activeUrl = currentGalleryImages[currentGalleryIndex];
+      window.open(activeUrl, '_blank');
+    };
+  }
+
+  if (addImageInput) {
+    addImageInput.onchange = (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          const b64 = evt.target.result;
+          if (!clip.visualImages) clip.visualImages = [];
+          if (!clip.visualImages.includes(b64)) clip.visualImages.push(b64);
+          if (!clip.aiVisualUrl) clip.aiVisualUrl = b64;
+          saveStateToStorage(true);
+          renderLibrary();
+          currentGalleryImages.push(b64);
+          currentGalleryIndex = currentGalleryImages.length - 1;
+          updateGalleryDisplay();
+          showToast('📸 Additional Slide Added to Clip!', 'success');
+        };
+        reader.readAsDataURL(file);
+      }
+    };
   }
 
   if (listenBtn) {
