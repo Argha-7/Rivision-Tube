@@ -670,25 +670,60 @@ body.yt-dark-theme {
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.95), 0 0 30px rgba(56, 189, 248, 0.25) !important;
 }
 
-/* Compact Clip Visual Card Preview */
-.yt-clip-visual {
+/* Compact Horizontal Scrollable Visual Strip */
+.yt-clip-visual-strip {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 2px;
   margin-top: 6px;
-  display: inline-block;
+  max-width: 100%;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
-.yt-clip-visual-img {
-  max-width: 140px;
-  height: 75px;
-  object-fit: cover;
+.yt-clip-visual-strip::-webkit-scrollbar {
+  height: 4px;
+}
+.yt-clip-visual-strip::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 4px;
+}
+.yt-clip-visual-thumb {
+  position: relative;
+  flex-shrink: 0;
+  width: 92px;
+  height: 52px;
   border-radius: var(--radius-xs);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
-  display: block;
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #000;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.yt-clip-visual-img:hover {
-  transform: scale(1.06);
+.yt-clip-visual-thumb:hover {
+  transform: translateY(-2px) scale(1.06);
   border-color: var(--yt-blue);
-  box-shadow: 0 4px 14px rgba(62, 166, 255, 0.4);
+  box-shadow: 0 4px 14px rgba(62, 166, 255, 0.45);
+}
+.yt-clip-visual-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.yt-clip-visual-thumb .thumb-zoom-badge {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  font-size: 0.58rem;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 2px;
+  pointer-events: none;
 }
 
 .fs-dock-actions {
@@ -3540,25 +3575,60 @@ body.yt-dark-theme {
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.95), 0 0 30px rgba(56, 189, 248, 0.25) !important;
 }
 
-/* Compact Clip Visual Card Preview */
-.yt-clip-visual {
+/* Compact Horizontal Scrollable Visual Strip */
+.yt-clip-visual-strip {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 2px;
   margin-top: 6px;
-  display: inline-block;
+  max-width: 100%;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
-.yt-clip-visual-img {
-  max-width: 140px;
-  height: 75px;
-  object-fit: cover;
+.yt-clip-visual-strip::-webkit-scrollbar {
+  height: 4px;
+}
+.yt-clip-visual-strip::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 4px;
+}
+.yt-clip-visual-thumb {
+  position: relative;
+  flex-shrink: 0;
+  width: 92px;
+  height: 52px;
   border-radius: var(--radius-xs);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
-  display: block;
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #000;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.yt-clip-visual-img:hover {
-  transform: scale(1.06);
+.yt-clip-visual-thumb:hover {
+  transform: translateY(-2px) scale(1.06);
   border-color: var(--yt-blue);
-  box-shadow: 0 4px 14px rgba(62, 166, 255, 0.4);
+  box-shadow: 0 4px 14px rgba(62, 166, 255, 0.45);
+}
+.yt-clip-visual-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.yt-clip-visual-thumb .thumb-zoom-badge {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  font-size: 0.58rem;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 2px;
+  pointer-events: none;
 }
 
 .fs-dock-actions {
@@ -6497,7 +6567,7 @@ body.yt-dark-theme {
   <!-- YouTube Iframe API Script -->
   
   <!-- Application Logic -->
-  <script src="app.js?v=2.7.0"></script>
+  <script src="app.js?v=2.8.0"></script>
 
   <!-- YouTube Iframe API Script -->
   <script src="https://www.youtube.com/iframe_api"></script>
@@ -7425,7 +7495,22 @@ function createClipCardElement(clip) {
           ${clip.aiVisualUrl ? `<button type="button" class="yt-btn-gallery-tag" data-action="open-gallery">🖼️ Visual Slide</button>` : ''}
           ${clip.voiceNoteBase64 ? `<button type="button" class="yt-btn-play-voice" data-action="play-voice">🎙️ Listen Memo</button>` : ''}
         </div>
-        ${clip.aiVisualUrl ? `<div class="yt-clip-visual" style="cursor: pointer;" data-action="open-gallery" title="Click to open Full HD Visual Gallery"><img src="${clip.aiVisualUrl}" alt="${escapeHtml(clip.title)}" class="yt-clip-visual-img" loading="lazy" /></div>` : ''}
+
+        <!-- Compact Horizontal Scrollable Visual Strip -->
+        ${clip.aiVisualUrl ? `
+          <div class="yt-clip-visual-strip" title="Click to view Full HD Slide">
+            <div class="yt-clip-visual-thumb" data-action="open-gallery" data-img="${clip.aiVisualUrl}">
+              <img src="${clip.aiVisualUrl}" alt="${escapeHtml(clip.title)}" loading="lazy" />
+              <span class="thumb-zoom-badge">🔍 HD</span>
+            </div>
+            ${(clip.visualImages || []).filter(u => u !== clip.aiVisualUrl).map(u => `
+              <div class="yt-clip-visual-thumb" data-action="open-gallery" data-img="${u}">
+                <img src="${u}" alt="${escapeHtml(clip.title)}" loading="lazy" />
+                <span class="thumb-zoom-badge">🔍 HD</span>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
       </div>
 
       <div class="yt-clip-actions">
@@ -7446,8 +7531,8 @@ function createClipCardElement(clip) {
   `;
 
   card.addEventListener('click', (e) => {
-    // If clicking card outside buttons, play
-    if (!e.target.closest('button') && !e.target.closest('a') && !e.target.closest('.yt-clip-visual')) {
+    // If clicking card outside buttons and visual thumbs, play
+    if (!e.target.closest('button') && !e.target.closest('a') && !e.target.closest('.yt-clip-visual-thumb')) {
       playSpecificClip(clip);
     }
   });
@@ -7461,7 +7546,8 @@ function createClipCardElement(clip) {
   galleryBtns.forEach(gBtn => {
     gBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      openVisualGalleryModal(clip);
+      const specificImg = gBtn.dataset.img || clip.aiVisualUrl;
+      openVisualGalleryModal(clip, specificImg);
     });
   });
 
@@ -9109,7 +9195,7 @@ function handleCaptureVideoSnapshot() {
   showToast('📸 Video Player Slide Snapshot Attached! 🖼️', 'success');
 }
 
-function openVisualGalleryModal(clip) {
+function openVisualGalleryModal(clip, specificImg = null) {
   if (!clip) return;
   const modal = document.getElementById('clipVisualGalleryModal');
   const img = document.getElementById('galleryModalImg');
@@ -9124,7 +9210,7 @@ function openVisualGalleryModal(clip) {
   if (notes) notes.textContent = clip.note || 'No notes attached. Mastered concept!';
 
   if (img) {
-    img.src = clip.aiVisualUrl || `https://img.youtube.com/vi/${clip.videoId}/hqdefault.jpg`;
+    img.src = specificImg || clip.aiVisualUrl || `https://img.youtube.com/vi/${clip.videoId}/hqdefault.jpg`;
   }
 
   if (listenBtn) {

@@ -918,7 +918,22 @@ function createClipCardElement(clip) {
           ${clip.aiVisualUrl ? `<button type="button" class="yt-btn-gallery-tag" data-action="open-gallery">🖼️ Visual Slide</button>` : ''}
           ${clip.voiceNoteBase64 ? `<button type="button" class="yt-btn-play-voice" data-action="play-voice">🎙️ Listen Memo</button>` : ''}
         </div>
-        ${clip.aiVisualUrl ? `<div class="yt-clip-visual" style="cursor: pointer;" data-action="open-gallery" title="Click to open Full HD Visual Gallery"><img src="${clip.aiVisualUrl}" alt="${escapeHtml(clip.title)}" class="yt-clip-visual-img" loading="lazy" /></div>` : ''}
+
+        <!-- Compact Horizontal Scrollable Visual Strip -->
+        ${clip.aiVisualUrl ? `
+          <div class="yt-clip-visual-strip" title="Click to view Full HD Slide">
+            <div class="yt-clip-visual-thumb" data-action="open-gallery" data-img="${clip.aiVisualUrl}">
+              <img src="${clip.aiVisualUrl}" alt="${escapeHtml(clip.title)}" loading="lazy" />
+              <span class="thumb-zoom-badge">🔍 HD</span>
+            </div>
+            ${(clip.visualImages || []).filter(u => u !== clip.aiVisualUrl).map(u => `
+              <div class="yt-clip-visual-thumb" data-action="open-gallery" data-img="${u}">
+                <img src="${u}" alt="${escapeHtml(clip.title)}" loading="lazy" />
+                <span class="thumb-zoom-badge">🔍 HD</span>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
       </div>
 
       <div class="yt-clip-actions">
@@ -939,8 +954,8 @@ function createClipCardElement(clip) {
   `;
 
   card.addEventListener('click', (e) => {
-    // If clicking card outside buttons, play
-    if (!e.target.closest('button') && !e.target.closest('a') && !e.target.closest('.yt-clip-visual')) {
+    // If clicking card outside buttons and visual thumbs, play
+    if (!e.target.closest('button') && !e.target.closest('a') && !e.target.closest('.yt-clip-visual-thumb')) {
       playSpecificClip(clip);
     }
   });
@@ -954,7 +969,8 @@ function createClipCardElement(clip) {
   galleryBtns.forEach(gBtn => {
     gBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      openVisualGalleryModal(clip);
+      const specificImg = gBtn.dataset.img || clip.aiVisualUrl;
+      openVisualGalleryModal(clip, specificImg);
     });
   });
 
@@ -2602,7 +2618,7 @@ function handleCaptureVideoSnapshot() {
   showToast('📸 Video Player Slide Snapshot Attached! 🖼️', 'success');
 }
 
-function openVisualGalleryModal(clip) {
+function openVisualGalleryModal(clip, specificImg = null) {
   if (!clip) return;
   const modal = document.getElementById('clipVisualGalleryModal');
   const img = document.getElementById('galleryModalImg');
@@ -2617,7 +2633,7 @@ function openVisualGalleryModal(clip) {
   if (notes) notes.textContent = clip.note || 'No notes attached. Mastered concept!';
 
   if (img) {
-    img.src = clip.aiVisualUrl || `https://img.youtube.com/vi/${clip.videoId}/hqdefault.jpg`;
+    img.src = specificImg || clip.aiVisualUrl || `https://img.youtube.com/vi/${clip.videoId}/hqdefault.jpg`;
   }
 
   if (listenBtn) {
