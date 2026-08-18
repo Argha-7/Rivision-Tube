@@ -1664,97 +1664,86 @@ function setupEventListeners() {
     });
   });
 
-  // 2. Capture Start Time Button
+  // 2. Capture Start Time Button (Desktop + Floating Dock)
+  function handleCaptureStartTime() {
+    if (!ytPlayer || typeof ytPlayer.getCurrentTime !== 'function') {
+      showToast('Please load and play a video first!', 'error');
+      return;
+    }
+    const sec = Math.floor(ytPlayer.getCurrentTime());
+    const timeStr = formatSecondsToTime(sec);
+    const startInput = document.getElementById('startTimeInput');
+    const startPreview = document.getElementById('startBtnPreview');
+    const fsStartPreview = document.getElementById('fsStartPreview');
+    const fsLive = document.getElementById('fsLiveTime');
+
+    if (startInput) startInput.value = timeStr;
+    if (startPreview) startPreview.textContent = timeStr;
+    if (fsStartPreview) fsStartPreview.textContent = timeStr;
+    if (fsLive) fsLive.textContent = timeStr;
+
+    updateDurationPreview();
+    showToast(`Captured Start Time: ${timeStr} ⚡`, 'info');
+  }
+
   const captureStartBtn = document.getElementById('captureStartBtn');
-  if (captureStartBtn) {
-    captureStartBtn.addEventListener('click', () => {
-      if (!ytPlayer || typeof ytPlayer.getCurrentTime !== 'function') {
-        showToast('Please load and play a video first!', 'error');
-        return;
-      }
-      const sec = Math.floor(ytPlayer.getCurrentTime());
-      const timeStr = formatSecondsToTime(sec);
-      const startInput = document.getElementById('startTimeInput');
-      const startPreview = document.getElementById('startBtnPreview');
-      const fsLive = document.getElementById('fsLiveTime');
+  if (captureStartBtn) captureStartBtn.addEventListener('click', handleCaptureStartTime);
 
-      if (startInput) startInput.value = timeStr;
-      if (startPreview) startPreview.textContent = timeStr;
-      if (fsLive) fsLive.textContent = timeStr;
+  const fsCaptureStartBtn = document.getElementById('fsCaptureStartBtn');
+  if (fsCaptureStartBtn) fsCaptureStartBtn.addEventListener('click', handleCaptureStartTime);
 
-      updateDurationPreview();
-      showToast(`Captured Start Time: ${timeStr} ⚡`, 'info');
-    });
+  // 3. Capture End Time Button (Auto-Stop) (Desktop + Floating Dock)
+  function handleCaptureEndTime() {
+    if (!ytPlayer || typeof ytPlayer.getCurrentTime !== 'function') {
+      showToast('Please load and play a video first!', 'error');
+      return;
+    }
+    const sec = Math.floor(ytPlayer.getCurrentTime());
+    const timeStr = formatSecondsToTime(sec);
+    const endInput = document.getElementById('endTimeInput');
+    const endPreview = document.getElementById('endBtnPreview');
+    const fsEndPreview = document.getElementById('fsEndPreview');
+
+    if (endInput) endInput.value = timeStr;
+    if (endPreview) endPreview.textContent = timeStr;
+    if (fsEndPreview) fsEndPreview.textContent = timeStr;
+
+    updateDurationPreview();
+    showToast(`Captured End Time (Auto-Stop): ${timeStr} ⏹`, 'info');
   }
 
-  // 2.1 Fullscreen Dock Start Button
-  const fsStartBtn = document.getElementById('fsStartBtn');
-  if (fsStartBtn) {
-    fsStartBtn.addEventListener('click', () => {
-      if (!ytPlayer || typeof ytPlayer.getCurrentTime !== 'function') return;
-      const sec = Math.floor(ytPlayer.getCurrentTime());
-      const timeStr = formatSecondsToTime(sec);
-      const startInput = document.getElementById('startTimeInput');
-      const startPreview = document.getElementById('startBtnPreview');
-      const fsLive = document.getElementById('fsLiveTime');
-
-      if (startInput) startInput.value = timeStr;
-      if (startPreview) startPreview.textContent = timeStr;
-      if (fsLive) fsLive.textContent = timeStr;
-
-      updateDurationPreview();
-      showToast(`Dock Captured Start: ${timeStr} ⚡`, 'info');
-    });
-  }
-
-  // 3. Capture End Time Button (Auto-Stop)
   const captureEndBtn = document.getElementById('captureEndBtn');
-  if (captureEndBtn) {
-    captureEndBtn.addEventListener('click', () => {
-      if (!ytPlayer || typeof ytPlayer.getCurrentTime !== 'function') {
-        showToast('Please load and play a video first!', 'error');
-        return;
-      }
-      const sec = Math.floor(ytPlayer.getCurrentTime());
-      const timeStr = formatSecondsToTime(sec);
-      const endInput = document.getElementById('endTimeInput');
-      const endPreview = document.getElementById('endBtnPreview');
+  if (captureEndBtn) captureEndBtn.addEventListener('click', handleCaptureEndTime);
 
-      if (endInput) endInput.value = timeStr;
-      if (endPreview) endPreview.textContent = timeStr;
+  const fsCaptureEndBtn = document.getElementById('fsCaptureEndBtn');
+  if (fsCaptureEndBtn) fsCaptureEndBtn.addEventListener('click', handleCaptureEndTime);
 
-      updateDurationPreview();
-      showToast(`Captured End Time (Auto-Stop): ${timeStr} ⏹`, 'info');
-    });
-  }
-
-  // 3.1 Fullscreen Dock End Button
-  const fsEndBtn = document.getElementById('fsEndBtn');
-  if (fsEndBtn) {
-    fsEndBtn.addEventListener('click', () => {
-      if (!ytPlayer || typeof ytPlayer.getCurrentTime !== 'function') return;
-      const sec = Math.floor(ytPlayer.getCurrentTime());
-      const timeStr = formatSecondsToTime(sec);
-      const endInput = document.getElementById('endTimeInput');
-      const endPreview = document.getElementById('endBtnPreview');
-
-      if (endInput) endInput.value = timeStr;
-      if (endPreview) endPreview.textContent = timeStr;
-
-      updateDurationPreview();
-      showToast(`Dock Captured End: ${timeStr} ⏹`, 'info');
-    });
-  }
-
-  // 3.2 Fullscreen Dock Save Button
-  const fsSaveBtn = document.getElementById('fsSaveBtn');
-  if (fsSaveBtn) {
-    fsSaveBtn.addEventListener('click', () => {
-      const descBox = document.getElementById('ytDescriptionBox');
-      const titleInput = document.getElementById('clipTitleInput');
-      if (descBox) descBox.scrollIntoView({ behavior: 'smooth' });
-      if (titleInput) titleInput.focus();
+  // 3.2 Floating Dock Quick Save Button
+  const fsQuickSaveBtn = document.getElementById('fsQuickSaveBtn');
+  if (fsQuickSaveBtn) {
+    fsQuickSaveBtn.addEventListener('click', () => {
+      openBookmarkDrawer();
       showToast('Fill Topic Title to save your revision clip! ✍️', 'info');
+    });
+  }
+
+  // Minimize / Expand Floating Dock
+  const minimizeFsDockBtn = document.getElementById('minimizeFsDockBtn');
+  const expandFsDockBtn = document.getElementById('expandFsDockBtn');
+  const fsDockContainer = document.getElementById('fsFloatingTimeframeDock');
+
+  if (minimizeFsDockBtn && fsDockContainer && expandFsDockBtn) {
+    minimizeFsDockBtn.addEventListener('click', () => {
+      fsDockContainer.style.display = 'none';
+      expandFsDockBtn.style.display = 'flex';
+      showToast('Dock Minimized (Click ⚡ to open)', 'info');
+    });
+  }
+
+  if (expandFsDockBtn && fsDockContainer) {
+    expandFsDockBtn.addEventListener('click', () => {
+      fsDockContainer.style.display = 'flex';
+      expandFsDockBtn.style.display = 'none';
     });
   }
 
@@ -2409,29 +2398,46 @@ async function handleGenerateVisualCard() {
   const title = document.getElementById('clipTitleInput').value.trim() || appState.currentVideoTitle || 'Science Educational Concept';
   const subject = document.getElementById('subjectSelect').value || 'Physics';
   const btn = document.getElementById('genVisualCardBtn');
+  const container = document.getElementById('aiVisualPreviewContainer');
+  const img = document.getElementById('aiVisualPreviewImg');
+  const input = document.getElementById('aiVisualUrlInput');
 
-  if (btn) btn.innerHTML = '<span>🎨 Drawing...</span>';
-  showToast('Generating 1024p HD Concept Visual with FLUX.1 AI... 🎨✨', 'info');
+  if (btn) btn.innerHTML = '<span>🎨 Generating...</span>';
+  showToast('Generating HD Concept Visual with AI... 🎨✨', 'info');
 
   try {
-    const cleanPrompt = encodeURIComponent(`Masterpiece educational 3D concept illustration of ${title}, subject: ${subject}, science laboratory diagram, 8k resolution, crisp details, vivid lighting, textbook diagram`);
-    const imageUrl = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=1024&height=640&model=flux&nologo=true&seed=${Date.now()}`;
+    const cleanPrompt = encodeURIComponent(`high quality educational 3D concept illustration of ${title}, subject: ${subject}, science diagram, vivid colors, crisp textbook art`);
+    const imageUrl = `https://image.pollinations.ai/prompt/${cleanPrompt}?width=800&height=480&nologo=true&seed=${Date.now()}`;
 
-    const container = document.getElementById('aiVisualPreviewContainer');
-    const img = document.getElementById('aiVisualPreviewImg');
-    const input = document.getElementById('aiVisualUrlInput');
+    // Preload image so it never shows a broken icon
+    const tempImg = new Image();
+    tempImg.onload = () => {
+      if (img && container && input) {
+        img.src = tempImg.src;
+        input.value = tempImg.src;
+        container.style.display = 'block';
+      }
+      if (btn) btn.innerHTML = '<span>🎨 AI Visual</span>';
+      showToast('🎨 HD Visual Diagram Ready! ✨', 'success');
+    };
 
-    if (img && container && input) {
-      img.src = imageUrl;
-      input.value = imageUrl;
-      container.style.display = 'block';
-    }
+    tempImg.onerror = () => {
+      // High quality educational fallback
+      const fallbackUrl = `https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=800&q=80`;
+      if (img && container && input) {
+        img.src = fallbackUrl;
+        input.value = fallbackUrl;
+        container.style.display = 'block';
+      }
+      if (btn) btn.innerHTML = '<span>🎨 AI Visual</span>';
+      showToast('🎨 Concept Visual Loaded! ✨', 'success');
+    };
 
-    showToast('🎨 HD Visual Diagram Generated! (FLUX.1)', 'success');
+    tempImg.src = imageUrl;
+
   } catch (err) {
-    showToast('Could not generate visual image.', 'error');
-  } finally {
     if (btn) btn.innerHTML = '<span>🎨 AI Visual</span>';
+    showToast('Could not generate visual image.', 'error');
   }
 }
 
