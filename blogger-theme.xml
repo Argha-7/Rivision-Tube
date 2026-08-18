@@ -6877,17 +6877,16 @@ function triggerClipCompletion() {
       if (titleElem) titleElem.textContent = clip.title || 'Concept Finished';
       if (metaElem) metaElem.textContent = `${clip.subject || 'General'} • ${clip.chapter || 'Topic'} (${clip.tag || 'Concept'})`;
 
-      // Show AI Visual Concept Art on Flashcard
-      if (clip.aiVisualUrl && visualImg && imgContainer) {
-        visualImg.src = clip.aiVisualUrl;
+      // Show AI Visual Concept Art on Flashcard (Always show topic-relevant 3D illustration)
+      if (visualImg && imgContainer) {
+        const topicImageUrl = clip.aiVisualUrl || `https://image.pollinations.ai/prompt/${encodeURIComponent('accurate 3D educational concept illustration of ' + (clip.title || 'Science') + ', ' + (clip.subject || 'Physics') + ', textbook diagram')}?width=800&height=440&nologo=true`;
+        visualImg.src = topicImageUrl;
         imgContainer.style.display = 'block';
-      } else if (imgContainer) {
-        imgContainer.style.display = 'none';
       }
 
-      // Prepare Secret Formulas & Notes
+      // Prepare Secret Formulas & Notes with ChatGPT-style rich boxes
       if (noteContent && notesBox) {
-        noteContent.textContent = clip.note || 'No additional formulas attached. Mastered concept!';
+        noteContent.innerHTML = formatAiNotesToChatGPTCards(clip.note || 'Mastered concept! No extra formulas attached.', '');
         notesBox.style.display = 'none'; // Initially hidden for active recall
       }
 
