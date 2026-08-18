@@ -97,16 +97,36 @@
             </div>
           </div>
 
-          <!-- Auto-Stop Overlay Alert with Spaced Repetition Recall -->
+          <!-- Auto-Stop Overlay Alert with Interactive AI Visual Flashcard & Spaced Repetition -->
           <div class="clip-completed-overlay" id="clipCompleteOverlay">
             <div class="completed-box">
-              <div class="completed-badge">🎉 CLIP COMPLETED!</div>
-              <h4 id="completedClipTitle">Explanation Finished</h4>
-              <p class="completed-msg">Video automatically stopped at the end of this concept to save your time.</p>
+              <div class="completed-badge">🎴 REVISION FLASHCARD & AUTO-STOP</div>
+              
+              <!-- AI Visual Flashcard Box -->
+              <div class="flashcard-preview-card" id="completedFlashcardCard">
+                <div class="flashcard-img-container" id="completedVisualImgContainer" style="display:none;">
+                  <img id="completedClipVisualImg" src="" alt="Concept Diagram" class="flashcard-visual-img" />
+                </div>
+                
+                <div class="flashcard-body">
+                  <div class="flashcard-meta" id="completedClipMeta">General • Concept</div>
+                  <h4 id="completedClipTitle" class="flashcard-title">Concept Finished</h4>
+                  
+                  <!-- Interactive Flip / Reveal Button for Secret Formulas -->
+                  <button type="button" class="flashcard-reveal-btn" id="revealFormulaBtn">
+                    🔄 <span id="revealFormulaBtnText">Tap to Reveal Teacher's Formulas & Trick</span>
+                  </button>
+                  
+                  <div class="flashcard-hidden-notes" id="completedFlashcardNotes" style="display:none;">
+                    <div class="flashcard-note-text" id="completedNoteContent"></div>
+                    <button type="button" class="yt-btn-read-note" id="listenFlashcardNoteBtn" style="margin-top:6px;">🔊 Listen Notes</button>
+                  </div>
+                </div>
+              </div>
               
               <!-- Spaced Repetition Memory Rating -->
               <div class="sr-recall-card">
-                <div class="sr-recall-title">🧠 Spaced Repetition Recall:</div>
+                <div class="sr-recall-title">🧠 Rate Recall Memory:</div>
                 <div class="sr-recall-actions">
                   <button type="button" class="sr-btn sr-btn-hard" id="srHardBtn" title="Struggled to recall - Review tomorrow">🔴 Hard (1d)</button>
                   <button type="button" class="sr-btn sr-btn-good" id="srGoodBtn" title="Good recall - Review in 3 days">🟢 Good (3d)</button>

@@ -433,6 +433,87 @@ body.yt-dark-theme {
   gap: 8px;
 }
 
+/* AI Visual Flashcard Card */
+.flashcard-preview-card {
+  background: rgba(18, 18, 18, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-bottom: 12px;
+  text-align: left;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+.flashcard-img-container {
+  width: 100%;
+  max-height: 180px;
+  overflow: hidden;
+  background: #000;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.flashcard-visual-img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+.flashcard-visual-img:hover {
+  transform: scale(1.03);
+}
+.flashcard-body {
+  padding: 10px 12px;
+}
+.flashcard-meta {
+  font-size: 0.7rem;
+  color: var(--yt-blue);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+.flashcard-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 8px 0;
+  line-height: 1.3;
+}
+.flashcard-reveal-btn {
+  width: 100%;
+  background: rgba(168, 85, 247, 0.15);
+  border: 1px dashed rgba(168, 85, 247, 0.5);
+  color: #d8b4fe;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all var(--transition-fast);
+}
+.flashcard-reveal-btn:hover {
+  background: rgba(168, 85, 247, 0.3);
+  color: #fff;
+  border-color: #a855f7;
+}
+.flashcard-hidden-notes {
+  margin-top: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  border-left: 3px solid var(--yt-blue);
+  border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
+  padding: 8px 10px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+.flashcard-note-text {
+  font-size: 0.78rem;
+  color: var(--yt-text-primary);
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
 /* Spaced Repetition Recall Assessment in Overlay */
 .sr-recall-card {
   background: rgba(0, 0, 0, 0.4);
@@ -3157,6 +3238,87 @@ body.yt-dark-theme {
   gap: 8px;
 }
 
+/* AI Visual Flashcard Card */
+.flashcard-preview-card {
+  background: rgba(18, 18, 18, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-bottom: 12px;
+  text-align: left;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+.flashcard-img-container {
+  width: 100%;
+  max-height: 180px;
+  overflow: hidden;
+  background: #000;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.flashcard-visual-img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+.flashcard-visual-img:hover {
+  transform: scale(1.03);
+}
+.flashcard-body {
+  padding: 10px 12px;
+}
+.flashcard-meta {
+  font-size: 0.7rem;
+  color: var(--yt-blue);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+.flashcard-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 8px 0;
+  line-height: 1.3;
+}
+.flashcard-reveal-btn {
+  width: 100%;
+  background: rgba(168, 85, 247, 0.15);
+  border: 1px dashed rgba(168, 85, 247, 0.5);
+  color: #d8b4fe;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all var(--transition-fast);
+}
+.flashcard-reveal-btn:hover {
+  background: rgba(168, 85, 247, 0.3);
+  color: #fff;
+  border-color: #a855f7;
+}
+.flashcard-hidden-notes {
+  margin-top: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  border-left: 3px solid var(--yt-blue);
+  border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
+  padding: 8px 10px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+.flashcard-note-text {
+  font-size: 0.78rem;
+  color: var(--yt-text-primary);
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
 /* Spaced Repetition Recall Assessment in Overlay */
 .sr-recall-card {
   background: rgba(0, 0, 0, 0.4);
@@ -5554,16 +5716,36 @@ body.yt-dark-theme {
             </div>
           </div>
 
-          <!-- Auto-Stop Overlay Alert with Spaced Repetition Recall -->
+          <!-- Auto-Stop Overlay Alert with Interactive AI Visual Flashcard &amp; Spaced Repetition -->
           <div class="clip-completed-overlay" id="clipCompleteOverlay">
             <div class="completed-box">
-              <div class="completed-badge">🎉 CLIP COMPLETED!</div>
-              <h4 id="completedClipTitle">Explanation Finished</h4>
-              <p class="completed-msg">Video automatically stopped at the end of this concept to save your time.</p>
+              <div class="completed-badge">🎴 REVISION FLASHCARD &amp; AUTO-STOP</div>
+              
+              <!-- AI Visual Flashcard Box -->
+              <div class="flashcard-preview-card" id="completedFlashcardCard">
+                <div class="flashcard-img-container" id="completedVisualImgContainer" style="display:none;">
+                  <img id="completedClipVisualImg" src="" alt="Concept Diagram" class="flashcard-visual-img" />
+                </div>
+                
+                <div class="flashcard-body">
+                  <div class="flashcard-meta" id="completedClipMeta">General • Concept</div>
+                  <h4 id="completedClipTitle" class="flashcard-title">Concept Finished</h4>
+                  
+                  <!-- Interactive Flip / Reveal Button for Secret Formulas -->
+                  <button type="button" class="flashcard-reveal-btn" id="revealFormulaBtn">
+                    🔄 <span id="revealFormulaBtnText">Tap to Reveal Teacher's Formulas &amp; Trick</span>
+                  </button>
+                  
+                  <div class="flashcard-hidden-notes" id="completedFlashcardNotes" style="display:none;">
+                    <div class="flashcard-note-text" id="completedNoteContent"></div>
+                    <button type="button" class="yt-btn-read-note" id="listenFlashcardNoteBtn" style="margin-top:6px;">🔊 Listen Notes</button>
+                  </div>
+                </div>
+              </div>
               
               <!-- Spaced Repetition Memory Rating -->
               <div class="sr-recall-card">
-                <div class="sr-recall-title">🧠 Spaced Repetition Recall:</div>
+                <div class="sr-recall-title">🧠 Rate Recall Memory:</div>
                 <div class="sr-recall-actions">
                   <button type="button" class="sr-btn sr-btn-hard" id="srHardBtn" title="Struggled to recall - Review tomorrow">🔴 Hard (1d)</button>
                   <button type="button" class="sr-btn sr-btn-good" id="srGoodBtn" title="Good recall - Review in 3 days">🟢 Good (3d)</button>
@@ -6647,9 +6829,50 @@ function startTimeTracking() {
 function triggerClipCompletion() {
   const overlay = document.getElementById('clipCompleteOverlay');
   const titleElem = document.getElementById('completedClipTitle');
+  const metaElem = document.getElementById('completedClipMeta');
+  const imgContainer = document.getElementById('completedVisualImgContainer');
+  const visualImg = document.getElementById('completedClipVisualImg');
+  const notesBox = document.getElementById('completedFlashcardNotes');
+  const noteContent = document.getElementById('completedNoteContent');
+  const revealBtn = document.getElementById('revealFormulaBtn');
+  const revealBtnText = document.getElementById('revealFormulaBtnText');
+  const listenBtn = document.getElementById('listenFlashcardNoteBtn');
   
   if (appState.activePlayingClip) {
-    titleElem.textContent = appState.activePlayingClip.title || 'Clip Finished';
+    const clip = appState.clips.find(c => c.id === appState.activePlayingClip.clipId);
+    if (clip) {
+      if (titleElem) titleElem.textContent = clip.title || 'Concept Finished';
+      if (metaElem) metaElem.textContent = `${clip.subject || 'General'} • ${clip.chapter || 'Topic'} (${clip.tag || 'Concept'})`;
+
+      // Show AI Visual Concept Art on Flashcard
+      if (clip.aiVisualUrl && visualImg && imgContainer) {
+        visualImg.src = clip.aiVisualUrl;
+        imgContainer.style.display = 'block';
+      } else if (imgContainer) {
+        imgContainer.style.display = 'none';
+      }
+
+      // Prepare Secret Formulas & Notes
+      if (noteContent && notesBox) {
+        noteContent.textContent = clip.note || 'No additional formulas attached. Mastered concept!';
+        notesBox.style.display = 'none'; // Initially hidden for active recall
+      }
+
+      if (revealBtn && revealBtnText) {
+        revealBtnText.textContent = "Tap to Reveal Teacher's Formulas & Trick 💡";
+        revealBtn.onclick = () => {
+          const isHidden = notesBox.style.display === 'none';
+          notesBox.style.display = isHidden ? 'block' : 'none';
+          revealBtnText.textContent = isHidden ? "🔼 Hide Formulas & Notes" : "Tap to Reveal Teacher's Formulas & Trick 💡";
+        };
+      }
+
+      if (listenBtn) {
+        listenBtn.onclick = () => {
+          if (clip.note) readOutNoteWithTTS(clip.note);
+        };
+      }
+    }
   }
   
   if (overlay) overlay.classList.add('active');
@@ -8451,10 +8674,16 @@ CRITICAL INSTRUCTIONS:
       noteTextarea.focus();
     }
 
+    // Auto-generate 3D Visual Diagram for a complete Visual Flashcard
+    const visualInput = document.getElementById('aiVisualUrlInput');
+    if (!visualInput || !visualInput.value) {
+      handleGenerateVisualCard();
+    }
+
     if (fetchedFromTranscriptAPI) {
-      showToast('Exact Subtitles & Master Teacher Notes Generated! 🎯🚀', 'success');
+      showToast('Exact Subtitles, AI Formulas & Visual Flashcard Generated! 🎯🎴', 'success');
     } else {
-      showToast('Master Teacher Revision Notes & Formulas Generated! ✨🚀', 'success');
+      showToast('Master Teacher Notes, Formulas & Visual Flashcard Generated! ✨🎴', 'success');
     }
   } else {
     showToast('Could not fetch transcript for this timeframe. Please check network connection.', 'error');

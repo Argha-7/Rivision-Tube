@@ -526,9 +526,50 @@ function startTimeTracking() {
 function triggerClipCompletion() {
   const overlay = document.getElementById('clipCompleteOverlay');
   const titleElem = document.getElementById('completedClipTitle');
+  const metaElem = document.getElementById('completedClipMeta');
+  const imgContainer = document.getElementById('completedVisualImgContainer');
+  const visualImg = document.getElementById('completedClipVisualImg');
+  const notesBox = document.getElementById('completedFlashcardNotes');
+  const noteContent = document.getElementById('completedNoteContent');
+  const revealBtn = document.getElementById('revealFormulaBtn');
+  const revealBtnText = document.getElementById('revealFormulaBtnText');
+  const listenBtn = document.getElementById('listenFlashcardNoteBtn');
   
   if (appState.activePlayingClip) {
-    titleElem.textContent = appState.activePlayingClip.title || 'Clip Finished';
+    const clip = appState.clips.find(c => c.id === appState.activePlayingClip.clipId);
+    if (clip) {
+      if (titleElem) titleElem.textContent = clip.title || 'Concept Finished';
+      if (metaElem) metaElem.textContent = `${clip.subject || 'General'} • ${clip.chapter || 'Topic'} (${clip.tag || 'Concept'})`;
+
+      // Show AI Visual Concept Art on Flashcard
+      if (clip.aiVisualUrl && visualImg && imgContainer) {
+        visualImg.src = clip.aiVisualUrl;
+        imgContainer.style.display = 'block';
+      } else if (imgContainer) {
+        imgContainer.style.display = 'none';
+      }
+
+      // Prepare Secret Formulas & Notes
+      if (noteContent && notesBox) {
+        noteContent.textContent = clip.note || 'No additional formulas attached. Mastered concept!';
+        notesBox.style.display = 'none'; // Initially hidden for active recall
+      }
+
+      if (revealBtn && revealBtnText) {
+        revealBtnText.textContent = "Tap to Reveal Teacher's Formulas & Trick 💡";
+        revealBtn.onclick = () => {
+          const isHidden = notesBox.style.display === 'none';
+          notesBox.style.display = isHidden ? 'block' : 'none';
+          revealBtnText.textContent = isHidden ? "🔼 Hide Formulas & Notes" : "Tap to Reveal Teacher's Formulas & Trick 💡";
+        };
+      }
+
+      if (listenBtn) {
+        listenBtn.onclick = () => {
+          if (clip.note) readOutNoteWithTTS(clip.note);
+        };
+      }
+    }
   }
   
   if (overlay) overlay.classList.add('active');
@@ -2330,10 +2371,16 @@ CRITICAL INSTRUCTIONS:
       noteTextarea.focus();
     }
 
+    // Auto-generate 3D Visual Diagram for a complete Visual Flashcard
+    const visualInput = document.getElementById('aiVisualUrlInput');
+    if (!visualInput || !visualInput.value) {
+      handleGenerateVisualCard();
+    }
+
     if (fetchedFromTranscriptAPI) {
-      showToast('Exact Subtitles & Master Teacher Notes Generated! 🎯🚀', 'success');
+      showToast('Exact Subtitles, AI Formulas & Visual Flashcard Generated! 🎯🎴', 'success');
     } else {
-      showToast('Master Teacher Revision Notes & Formulas Generated! ✨🚀', 'success');
+      showToast('Master Teacher Notes, Formulas & Visual Flashcard Generated! ✨🎴', 'success');
     }
   } else {
     showToast('Could not fetch transcript for this timeframe. Please check network connection.', 'error');
